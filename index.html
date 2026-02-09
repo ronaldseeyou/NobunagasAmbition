@@ -2,414 +2,559 @@
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8" />
-  <title>信長之野望 戰績統計 v6</title>
+  <title>信長之野望 戰績統計 v15</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
-      --bg: #020617; --card: #111827; --header-bg: #030712;
-      --border: #1f2937; --accent: #38bdf8; --text: #e5e7eb;
-      --muted: #6b7280; --win: #4ade80; --lose: #f97373;
-      --money: #fbbf24;
+      /* Dark Mode Theme */
+      --bg: #000000; --card: #121212; --header-bg: #0a0a0a;
+      --border: #27272a; --accent: #38bdf8; --text: #e5e7eb;
+      --muted: #a1a1aa; --win: #4ade80; --lose: #ef4444;
+      --money: #fbbf24; --oda: #dc2626; --united: #2563eb;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-      background: radial-gradient(circle at top, #0b1120 0, #020617 50%, #000 100%);
-      color: var(--text); min-height: 100vh; padding-bottom: 100px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text); min-height: 100vh; padding-bottom: 60px;
     }
     
-    header { position: sticky; top: 0; z-index: 10; padding: 16px; border-bottom: 1px solid var(--border); background: rgba(3,7,18,0.98); backdrop-filter: blur(20px); }
-    h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
-    h2 { font-size: 16px; font-weight: 600; color: var(--accent); margin: 32px 0 16px; }
+    /* Header 置中 + Icon 加大 */
+    header { position: sticky; top: 0; z-index: 10; padding: 16px 12px; border-bottom: 1px solid var(--border); background: rgba(10,10,10,0.95); backdrop-filter: blur(10px); text-align: center; }
+    .header-content { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .header-icon { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 2px solid var(--accent); }
+    h1 { font-size: 18px; font-weight: 700; color: var(--accent); margin: 0; }
+    h2 { font-size: 12px; color: var(--muted); font-weight: 400; margin: 0; }
 
-    .tab-container { 
-      background: var(--card); border-radius: 16px; margin-bottom: 24px; 
-      border: 1px solid var(--border); overflow: hidden; 
-    }
-    .tab-buttons {
-      display: flex; background: var(--header-bg); border-bottom: 1px solid var(--border);
-    }
-    .tab-btn {
-      flex: 1; padding: 16px; text-align: center; font-weight: 600; font-size: 15px;
-      color: var(--muted); border: none; background: none; cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .tab-btn.active {
-      color: var(--accent); background: rgba(56,189,248,0.1);
-    }
-    .tab-content {
-      display: none; padding: 24px; min-height: 400px;
-    }
+    .container { max-width: 900px; margin: 0 auto; padding: 12px; }
+    
+    .tabs { display: flex; justify-content: center; gap: 8px; margin: 12px 0; border-bottom: 2px solid var(--border); }
+    .tab { padding: 10px 20px; background: transparent; color: var(--muted); border: none; cursor: pointer; font-size: 14px; font-weight: 500; border-bottom: 2px solid transparent; transition: all 0.2s; }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    
+    .tab-content { display: none; }
     .tab-content.active { display: block; }
+    
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px; }
+    .section-title { font-size: 15px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 6px; }
+    
+    /* 陣營勝率 (動態顏色) */
+    .faction-stats { background: var(--card); border-radius: 10px; border: 1px solid var(--border); padding: 16px; margin-bottom: 18px; }
+    .faction-header { font-size: 12px; color: var(--muted); margin-bottom: 10px; text-align: center; }
+    .faction-bar-container { display: flex; height: 40px; border-radius: 6px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+    .faction-bar { display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; transition: all 0.3s; position: relative; color: #fff; }
+    /* 顏色會由 JS 動態控制 */
+    .faction-bar span { z-index: 1; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+    
+    .table-card { background: var(--card); border-radius: 10px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.1); margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
+    th { background: #18181b; color: var(--muted); font-weight: 500; padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { padding: 12px; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover { background: rgba(255, 255, 255, 0.03); }
+    
+    .player-name { font-weight: 600; color: #fff; display: block; font-size: 13px; }
+    .team-name { font-weight: 600; color: #fff; font-size: 12px; line-height: 1.4; }
+    .top3-heroes { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.3; }
+    
+    .win-rate { font-weight: 700; }
+    .win-rate.high { color: var(--win); }
+    .win-rate.mid { color: var(--money); }
+    .win-rate.low { color: var(--lose); }
+    
+    .money { font-family: monospace; font-weight: 600; }
+    .money.plus { color: var(--win); }
+    .money.minus { color: var(--lose); }
 
-    main { max-width: 900px; margin: 0 auto; padding: 16px; }
+    /* Sorting Control */
+    .sort-controls { display: flex; gap: 8px; }
+    .sort-btn { background: #27272a; color: #a1a1aa; border: 1px solid #3f3f46; padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; transition: all 0.2s; }
+    .sort-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
 
-    .overview-table { background: var(--card); border-radius: 16px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 24px; box-shadow: 0 12px 40px rgba(0,0,0,0.6); }
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td { padding: 14px 12px; border-bottom: 1px solid rgba(31,41,55,0.6); text-align: center; }
-    th { background: var(--header-bg); color: var(--muted); font-weight: 500; font-size: 12px; }
-    tr:hover td { background: rgba(15,23,42,0.6); }
-    .player-name-col { text-align: left; min-width: 100px; }
-    .player-name { font-weight: 700; }
-    .winrate.good { color: var(--win); font-weight: 700; }
-    .winrate.bad { color: var(--lose); font-weight: 700; }
-    .money.good { color: var(--money); font-weight: 700; }
-    .money.bad { color: var(--lose); font-weight: 700; }
-    .top-heroes { font-size: 12px; text-align: left; color: var(--muted); }
+    .hero-stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+    .hero-stats-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+    .hero-stats-header { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+    .hero-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 12px; }
+    .hero-item:not(:last-child) { border-bottom: 1px solid #1e293b; }
+    .hero-name { color: var(--text); font-weight: 500; }
+    .hero-stats { color: var(--muted); font-size: 11px; }
+    .hero-rate { margin-left: 10px; font-weight: 600; }
+    .hero-rate.high { color: var(--win); }
+    .hero-rate.mid { color: var(--money); }
+    .hero-rate.low { color: var(--lose); }
 
-    .daily-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 16px; margin-bottom: 24px;
-    }
-    .daily-card {
-      background: var(--card); border-radius: 16px; padding: 20px;
-      border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    }
-    .daily-header { 
-      font-weight: 700; font-size: 20px; margin-bottom: 16px; color: var(--accent);
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .daily-money { 
-      font-weight: 700; font-size: 16px; padding: 8px 12px; border-radius: 20px;
-      min-width: 80px; text-align: center;
-    }
-    .daily-money.win { background: rgba(74,222,128,0.25); color: var(--win); border: 1px solid rgba(74,222,128,0.4); }
-    .daily-money.lose { background: rgba(249,115,115,0.25); color: var(--lose); border: 1px solid rgba(249,115,115,0.4); }
-    .daily-item {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 12px; background: rgba(15,23,42,0.6); border-radius: 12px;
-      border: 1px solid rgba(31,41,55,0.8); margin-bottom: 8px;
-    }
-    .daily-item:last-child { margin-bottom: 0; }
-    .player-info { font-weight: 500; }
-    .wl-info { font-weight: 600; }
-    .wl-info.win { color: var(--win); }
-    .wl-info.lose { color: var(--lose); }
-    .wl-info.mixed { 
-      background: linear-gradient(90deg, var(--win) 50%, var(--lose) 50%); 
-      -webkit-background-clip: text; 
-      -webkit-text-fill-color: transparent; 
-      background-clip: text;
-      font-weight: 700;
-    }
-    .heroes-list { font-size: 12px; color: var(--muted); }
+    .date-group { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 16px; }
+    .date-header { font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+    
+    .match-card { background: #0a0a0a; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; padding: 12px; }
+    .match-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 12px; padding-bottom: 6px; border-bottom: 1px solid #27272a; }
+    .match-number { color: var(--muted); font-weight: 600; }
+    .match-bet { color: var(--money); font-weight: 600; }
+    
+    .match-teams { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .team { padding: 10px; border-radius: 6px; position: relative; }
+    .team.oda { border: 1px solid rgba(220, 38, 38, 0.4); }
+    .team.united { border: 1px solid rgba(37, 99, 235, 0.4); }
+    
+    .team.oda.winner,
+    .team.united.winner { background: rgba(74, 222, 128, 0.1); border-color: rgba(74, 222, 128, 0.5); }
+    .team.oda.loser,
+    .team.united.loser { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.5); }
+    
+    .team-header { font-size: 14px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; display: flex; align-items: center; gap: 6px; color: #fff; text-shadow: 0 1px 2px #000; }
+    .team.winner .team-header::before { content: "✅"; }
+    .team.loser .team-header::before { content: "❌"; opacity: 0.7; }
+    
+    .match-player { font-size: 12px; margin-bottom: 4px; line-height: 1.4; padding: 3px 0; }
+    .match-player strong { color: var(--text); font-weight: 600; }
+    .match-player span { opacity: 0.7; font-size: 11px; margin-left: 5px; }
 
-    .player-hero-section { background: var(--card); border-radius: 16px; padding: 20px; border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.4); margin-bottom: 24px; }
-    .player-hero-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;
-    }
-    .player-hero-card {
-      background: rgba(15,23,42,0.6); border-radius: 12px; padding: 16px;
-      border: 1px solid rgba(31,41,55,0.8);
-    }
-    .player-name-hero { font-weight: 700; font-size: 16px; margin-bottom: 12px; color: var(--accent); }
-    .hero-usage-row { 
-      display: grid; grid-template-columns: 2fr 1fr 1fr; 
-      gap: 12px; padding: 8px 0; border-bottom: 1px solid rgba(31,41,55,0.4); font-size: 13px;
-    }
-    .hero-usage-row:last-child { border-bottom: none; }
-    .hero-name-usage { font-weight: 500; }
-    .hero-count-usage { font-weight: 700; color: var(--accent); text-align: center; }
-    .hero-winrate-usage { font-weight: 600; text-align: center; }
-    .hero-winrate-usage.good { color: var(--win); }
-    .hero-winrate-usage.bad { color: var(--lose); }
-
-    .bottom-bar {
-      position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 16px;
-      background: rgba(3,7,18,0.98); backdrop-filter: blur(20px); border-top: 1px solid var(--border);
-      font-size: 12px; color: var(--muted); display: flex; justify-content: space-between;
-    }
-
-    @media (max-width: 640px) {
-      .tab-buttons { flex-direction: column; }
-      .tab-btn { padding: 20px 16px; border-bottom: 1px solid rgba(31,41,55,0.3); }
-      .daily-grid, .player-hero-grid { grid-template-columns: 1fr; }
-      .hero-usage-row { grid-template-columns: 1fr; text-align: left; gap: 8px; }
-      table { font-size: 13px; }
-      th, td { padding: 12px 8px; }
-    }
+    footer { text-align: center; font-size: 11px; color: var(--muted); margin-top: 30px; opacity: 0.5; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>信長之野望 戰績統計 v6</h1>
-    <p>玩家總覽 → 每日對戰($) → 玩家英雄勝率</p>
-  </header>
 
-  <main>
-    <div class="tab-container">
-      <div class="tab-buttons">
-        <button class="tab-btn active" data-tab="players">👥 玩家</button>
-        <button class="tab-btn" data-tab="daily">📅 每日對戰</button>
-      </div>
-      
-      <div class="tab-content active" id="players">
-        <h2>玩家總覽（勝率→英雄池排序）</h2>
-        <div class="overview-table">
-          <table id="overviewTable">
-            <thead>
-              <tr>
-                <th class="player-name-col">玩家</th>
-                <th>總場數</th>
-                <th>勝率</th>
-                <th>英雄池</th>
-                <th>最常用Top3</th>
-                <th>總金額</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-
-        <h2>🎯 玩家英雄勝率</h2>
-        <div class="player-hero-section">
-          <div class="player-hero-grid" id="playerHeroGrid"></div>
-        </div>
-      </div>
-
-      <div class="tab-content" id="daily">
-        <div class="daily-grid" id="dailyGrid"></div>
+<header>
+  <div class="container">
+    <div class="header-content">
+      <img src="https://raw.githubusercontent.com/ronaldseeyou/NobunagasAmbition/main/images/p4JFAns.jpg" alt="Logo" class="header-icon">
+      <div class="header-text">
+        <h1>⚔️ 信長之野望 戰績網</h1>
+        <h2>即時統計 / 陣營對抗 / 英雄數據</h2>
       </div>
     </div>
-  </main>
+  </div>
+</header>
 
-  <div class="bottom-bar">
-    <div>✅ iPhone Safari 完美支援</div>
-    <div>總玩家 <span id="playerCount">0</span> | 總對戰 <span id="totalSessions">0</span></div>
+<div class="container">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('players')">👥 玩家</button>
+    <button class="tab" onclick="switchTab('matches')">📅 每日對戰</button>
   </div>
 
-  <script>
-    // ✅ 修正數據 - 2月1 water只玩1場，其他玩3場；子誠2月7-8修正
-    const rawData = [
-      // === 2月1日 - water 1場，其他3場 ===
-      { player: "water", date: "2月1", heroes: [{name: "山王", result: "W"}] },                    // 1場
-      { player: "杜演", date: "2月1", heroes: [
-        {name: "利家", result: "W"}, {name: "森仔", result: "L"}, {name: "村上", result: "W"}, {name: "肥川", result: "L"}
-      ] },  // 3場
-      { player: "woman", date: "2月1", heroes: [{name: "森仔", result: "W"}] },                    // 1場
-      { player: "俊", date: "2月1", heroes: [{name: "信長", result: "W"}, {name: "慶次", result: "W"}] },  // 2場
-      { player: "哲", date: "2月1", heroes: [
-        {name: "肥川", result: "L"}, {name: "松姬", result: "L"}, {name: "果心", result: "W"}, 
-        {name: "果心", result: "W"}, {name: "森仔", result: "W"}, {name: "信長", result: "W"}
-      ] },  // 3場
-      { player: "子誠", date: "2月1", heroes: [
-        {name: "三好", result: "L"}, {name: "稻姬", result: "L"}, {name: "牛牛", result: "L"}
-      ] },  // 3場
-      { player: "傑", date: "2月1", heroes: [
-        {name: "jj佬", result: "L"}, {name: "百地", result: "L"}
-      ] },  // 2場
+  <div id="players-tab" class="tab-content active">
+    <!-- 陣營勝率 -->
+    <div class="section-title">⚔️ 陣營勝率</div>
+    <div class="faction-stats">
+      <div class="faction-header">總共 <span id="total-matches">0</span> 場對戰</div>
+      <div class="faction-bar-container">
+        <div class="faction-bar" id="oda-bar">
+          <span id="oda-text">織田軍 0%</span>
+        </div>
+        <div class="faction-bar" id="united-bar">
+          <span id="united-text">聯合軍 0%</span>
+        </div>
+      </div>
+    </div>
 
-      // === 2月7-8 - 子誠修正 ===
-      { player: "water", date: "2月7", heroes: [{name: "直江", result: "W"}, {name: "信長", result: "W"}] },
-      { player: "子誠", date: "2月7", heroes: [{name: "義龍", result: "L"}, {name: "果心", result: "L"}] },     // 2輸 = -300
-      { player: "woman", date: "2月7", heroes: [{name: "馬場", result: "W"}, {name: "森仔", result: "W"}] },
-      { player: "杜演", date: "2月7", heroes: [{name: "偷錢佬", result: "L"}, {name: "肥川", result: "L"}] },
-      { player: "哲", date: "2月7", heroes: [{name: "三好", result: "W"}, {name: "義龍", result: "W"}] },
-      { player: "傑", date: "2月7", heroes: [{name: "JJ佬", result: "L"}, {name: "百地", result: "L"}] },
+    <div class="section-title">🏆 玩家總覽</div>
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>玩家</th>
+            <th>場數 (W/L)</th>
+            <th>勝率</th>
+            <th>英雄池</th>
+            <th>最常用Top3英雄</th>
+            <th>總金額</th>
+          </tr>
+        </thead>
+        <tbody id="player-overview-body"></tbody>
+      </table>
+    </div>
 
-      { player: "子誠", date: "2月8", heroes: [{name: "瀧川", result: "W"}, {name: "風魔", result: "L"}, {name: "濃姬", result: "W"}] },  // 2贏1輸 = +150
-      { player: "woman", date: "2月8", heroes: [{name: "肥川", result: "L"}, {name: "酒井", result: "W"}, {name: "馬場", result: "L"}] },
-      { player: "杜演", date: "2月8", heroes: [{name: "森仔", result: "W"}, {name: "牛牛", result: "L"}, {name: "利家", result: "W"}] },
-      { player: "哲", date: "2月8", heroes: [{name: "直江", result: "L"}, {name: "佐佐", result: "W"}, {name: "勝賴", result: "L"}] },
-      { player: "俊", date: "2月8", heroes: [{name: "義龍", result: "L"}, {name: "羽柴", result: "W"}, {name: "光秀", result: "L"}] },
-      { player: "傑", date: "2月8", heroes: [{name: "酒井", result: "W"}, {name: "道雪", result: "L"}, {name: "單乳", result: "W"}] }
-    ];
+    <div class="section-title">🤝 組隊勝率 (3人組)</div>
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>隊伍組合</th>
+            <th>總場次</th>
+            <th>戰績 (W/L)</th>
+            <th>勝率</th>
+          </tr>
+        </thead>
+        <tbody id="team-stats-body"></tbody>
+      </table>
+    </div>
 
-    function computeMoney(session) {
-      const wins = session.heroes.filter(h => h.result === 'W').length;
-      const losses = session.heroes.filter(h => h.result === 'L').length;
-      return wins * 150 - losses * 150;
+    <!-- 玩家英雄勝率 (新增 Sorting) -->
+    <div class="section-header">
+      <div class="section-title">🎯 玩家英雄勝率</div>
+      <div class="sort-controls">
+        <button class="sort-btn active" onclick="sortHeroes('count')">按次數</button>
+        <button class="sort-btn" onclick="sortHeroes('rate')">按勝率</button>
+      </div>
+    </div>
+    <div class="hero-stats-grid" id="hero-stats-container"></div>
+  </div>
+
+  <div id="matches-tab" class="tab-content">
+    <div class="section-title">📅 對戰歷史</div>
+    <div id="matches-list"></div>
+  </div>
+
+  <footer>
+    Last Updated: <span id="last-update"></span>
+  </footer>
+</div>
+
+<script>
+  const matches = [
+    {
+      date: "2月1日 第1場", bet: 150, winner: "oda",
+      oda: [
+        { name: "Water", hero: "山王" },
+        { name: "杜演", hero: "利家" },
+        { name: "Woman", hero: "森仔" },
+        { name: "俊", hero: "信長" }
+      ],
+      united: [
+        { name: "哲", hero: "肥川" },
+        { name: "傑", hero: "松姬" },
+        { name: "子誠", hero: "三好" }
+      ]
+    },
+    {
+      date: "2月1日 第2場", bet: 150, winner: "united",
+      oda: [
+        { name: "Woman", hero: "森仔" },
+        { name: "傑", hero: "JJ佬" },
+        { name: "子誠", hero: "稻姬" }
+      ],
+      united: [
+        { name: "哲", hero: "果心" },
+        { name: "俊", hero: "慶次" },
+        { name: "杜演", hero: "村上" }
+      ]
+    },
+    {
+      date: "2月1日 第3場", bet: 150, winner: "oda",
+      oda: [
+        { name: "哲", hero: "果心" },
+        { name: "杜演", hero: "森仔" },
+        { name: "俊", hero: "信長" }
+      ],
+      united: [
+        { name: "傑", hero: "百地" },
+        { name: "Woman", hero: "肥川" },
+        { name: "子誠", hero: "牛牛" }
+      ]
+    },
+    {
+      date: "2月7日 第1場", bet: 150, winner: "united",
+      oda: [
+        { name: "子誠", hero: "義龍" },
+        { name: "杜演", hero: "偷錢佬" },
+        { name: "傑", hero: "JJ佬" }
+      ],
+      united: [
+        { name: "Water", hero: "直江" },
+        { name: "哲", hero: "三好" },
+        { name: "Woman", hero: "馬場" }
+      ]
+    },
+    {
+      date: "2月7日 第2場", bet: 150, winner: "oda",
+      oda: [
+        { name: "Water", hero: "信長" },
+        { name: "哲", hero: "義龍" },
+        { name: "Woman", hero: "森仔" }
+      ],
+      united: [
+        { name: "子誠", hero: "果心" },
+        { name: "杜演", hero: "肥川" },
+        { name: "傑", hero: "百地" }
+      ]
+    },
+    {
+      date: "2月8日 第1場", bet: 200, winner: "oda",
+      oda: [
+        { name: "子誠", hero: "瀧川" },
+        { name: "杜演", hero: "森仔" },
+        { name: "傑", hero: "酒井" }
+      ],
+      united: [
+        { name: "哲", hero: "直江" },
+        { name: "Woman", hero: "肥川" },
+        { name: "俊", hero: "義龍" }
+      ]
+    },
+    {
+      date: "2月8日 第2場", bet: 200, winner: "oda",
+      oda: [
+        { name: "哲", hero: "佐佐" },
+        { name: "Woman", hero: "酒井" },
+        { name: "俊", hero: "羽柴" }
+      ],
+      united: [
+        { name: "子誠", hero: "風魔" },
+        { name: "杜演", hero: "牛牛" },
+        { name: "傑", hero: "道雪" }
+      ]
+    },
+    {
+      date: "2月8日 第3場", bet: 200, winner: "oda",
+      oda: [
+        { name: "子誠", hero: "濃姬" },
+        { name: "杜演", hero: "利家" },
+        { name: "傑", hero: "單羽" }
+      ],
+      united: [
+        { name: "哲", hero: "勝賴" },
+        { name: "Woman", hero: "馬場" },
+        { name: "俊", hero: "光秀" }
+      ]
+    }
+  ];
+
+  let currentHeroSort = 'count'; // 'count' or 'rate'
+  let cachedSortedPlayers = [];
+  let cachedHeroStats = {};
+
+  function renderSite() {
+    const stats = {};
+    const heroStats = {};
+    const teamStats = {};
+
+    const odaWins = matches.filter(m => m.winner === "oda").length;
+    const unitedWins = matches.filter(m => m.winner === "united").length;
+    const total = matches.length;
+    const odaPercent = Math.round((odaWins / total) * 100);
+    const unitedPercent = Math.round((unitedWins / total) * 100);
+
+    document.getElementById('total-matches').innerText = total;
+    
+    // Dynamic Faction Colors
+    const odaBar = document.getElementById('oda-bar');
+    const unitedBar = document.getElementById('united-bar');
+    
+    odaBar.style.width = odaPercent + '%';
+    unitedBar.style.width = unitedPercent + '%';
+    document.getElementById('oda-text').innerText = `織田軍 ${odaPercent}%`;
+    document.getElementById('united-text').innerText = `聯合軍 ${unitedPercent}%`;
+
+    // High Win Rate = Green, Low = Red
+    if (odaPercent >= 50) {
+      odaBar.style.background = "var(--win)";
+      unitedBar.style.background = "var(--lose)";
+    } else {
+      odaBar.style.background = "var(--lose)";
+      unitedBar.style.background = "var(--win)";
     }
 
-    function getWLSummary(session) {
-      const wins = session.heroes.filter(h => h.result === 'W').length;
-      const losses = session.heroes.filter(h => h.result === 'L').length;
-      return `${wins}贏/${losses}輸`;
-    }
+    matches.forEach(match => {
+      const bet = match.bet;
+      const isOdaWin = match.winner === "oda";
+      const winningTeam = isOdaWin ? match.oda : match.united;
+      const losingTeam = isOdaWin ? match.united : match.oda;
 
-    // Tab System
-    function initTabs() {
-      const tabs = document.querySelectorAll('.tab-btn');
-      tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          const target = tab.dataset.tab;
-          tabs.forEach(t => t.classList.remove('active'));
-          tab.classList.add('active');
-          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-          document.getElementById(target).classList.add('active');
-        });
-      });
-    }
+      const totalPot = losingTeam.length * bet;
+      const winAmount = totalPot / winningTeam.length;
+      const loseAmount = bet;
 
-    // Section 1: Player Overview - ✅ 金錢重新計算
-    function renderOverviewTable() {
-      const players = {};
-      rawData.forEach(session => {
-        if (!players[session.player]) {
-          players[session.player] = { totalGames: 0, totalWins: 0, totalLosses: 0, totalMoney: 0, heroUsage: {} };
+      [
+        { team: match.oda, won: isOdaWin },
+        { team: match.united, won: !isOdaWin }
+      ].forEach(({ team, won }) => {
+        if (team.length === 3) {
+          const names = team.map(p => p.name).sort();
+          const teamKey = names.join(" & ");
+          if (!teamStats[teamKey]) teamStats[teamKey] = { wins: 0, losses: 0, total: 0 };
+          teamStats[teamKey].total++;
+          if (won) teamStats[teamKey].wins++;
+          else teamStats[teamKey].losses++;
         }
-        const p = players[session.player];
-        const wins = session.heroes.filter(h => h.result === 'W').length;
-        const losses = session.heroes.filter(h => h.result === 'L').length;
-        p.totalGames += wins + losses;
-        p.totalWins += wins;
-        p.totalLosses += losses;
-        p.totalMoney += computeMoney(session);
-        session.heroes.forEach(h => {
-          p.heroUsage[h.name] = (p.heroUsage[h.name] || 0) + 1;
-        });
       });
 
-      const playerStats = Object.entries(players).map(([name, stats]) => {
-        const topHeroes = Object.entries(stats.heroUsage)
-          .sort(([,a], [,b]) => b - a).slice(0, 3).map(([h]) => h);
-        return {
-          name, ...stats,
-          winrate: stats.totalGames ? Math.round(stats.totalWins / stats.totalGames * 100) : 0,
-          heroCount: Object.keys(stats.heroUsage).length,
-          topHeroes: topHeroes.join(' ')
-        };
-      }).sort((a, b) => {
-        if (b.winrate !== a.winrate) return b.winrate - a.winrate;
-        if (b.heroCount !== a.heroCount) return b.heroCount - a.heroCount;
-        return b.totalGames - a.totalGames;
+      winningTeam.forEach(p => {
+        if (!stats[p.name]) stats[p.name] = { wins: 0, losses: 0, money: 0, heroes: [] };
+        stats[p.name].wins++;
+        stats[p.name].money += winAmount;
+        stats[p.name].heroes.push(p.hero);
+
+        if (!heroStats[p.name]) heroStats[p.name] = {};
+        if (!heroStats[p.name][p.hero]) heroStats[p.name][p.hero] = { wins: 0, losses: 0 };
+        heroStats[p.name][p.hero].wins++;
       });
 
-      const tbody = document.querySelector("#overviewTable tbody");
-      tbody.innerHTML = "";
-      playerStats.forEach(p => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td class="player-name-col player-name">${p.name}</td>
-          <td>${p.totalGames}</td>
-          <td class="winrate ${p.winrate >= 50 ? 'good' : 'bad'}">${p.winrate}%</td>
-          <td>${p.heroCount}</td>
-          <td class="top-heroes">${p.topHeroes || '—'}</td>
-          <td class="money ${p.totalMoney >= 0 ? 'good' : 'bad'}">${p.totalMoney >= 0 ? '+' : ''}$${Math.round(p.totalMoney)}</td>
-        `;
-        tbody.appendChild(tr);
+      losingTeam.forEach(p => {
+        if (!stats[p.name]) stats[p.name] = { wins: 0, losses: 0, money: 0, heroes: [] };
+        stats[p.name].losses++;
+        stats[p.name].money -= loseAmount;
+        stats[p.name].heroes.push(p.hero);
+
+        if (!heroStats[p.name]) heroStats[p.name] = {};
+        if (!heroStats[p.name][p.hero]) heroStats[p.name][p.hero] = { wins: 0, losses: 0 };
+        heroStats[p.name][p.hero].losses++;
       });
+    });
 
-      document.getElementById('playerCount').textContent = playerStats.length;
-      document.getElementById('totalSessions').textContent = rawData.length;
-    }
-
-    // Section 2: Daily Grid - ✅ 顯示實際session金錢
-    function renderDailyGrid() {
-      const days = {};
-      rawData.forEach(session => {
-        if (!days[session.date]) days[session.date] = [];
-        days[session.date].push(session);
-      });
-
-      const sortedDays = Object.entries(days).sort((a, b) => {
-        const m1 = a[0].match(/(\d+)月(\d+)/);
-        const m2 = b[0].match(/(\d+)月(\d+)/);
-        const d1 = m1 ? parseInt(m1[1]) * 100 + parseInt(m1[2]) : 0;
-        const d2 = m2 ? parseInt(m2[1]) * 100 + parseInt(m2[2]) : 0;
-        return d2 - d1;
-      });
-
-      const container = document.getElementById('dailyGrid');
-      container.innerHTML = "";
-
-      sortedDays.forEach(([date, sessions]) => {
-        const totalDayMoney = sessions.reduce((sum, s) => sum + computeMoney(s), 0);
-        const card = document.createElement('div');
-        card.className = 'daily-card';
-        const moneyClass = totalDayMoney >= 0 ? 'win' : 'lose';
-        card.innerHTML = `
-          <div class="daily-header">
-            <span>${date}</span>
-            <span class="daily-money ${moneyClass}">+$${Math.round(totalDayMoney)}</span>
-          </div>
-        `;
-        
-        sessions.forEach(session => {
-          const wins = session.heroes.filter(h => h.result === 'W').length;
-          const losses = session.heroes.filter(h => h.result === 'L').length;
-          
-          let wlClass = 'win';
-          if (losses > 0 && wins > 0) wlClass = 'mixed';
-          else if (losses > 0) wlClass = 'lose';
-          
-          const item = document.createElement('div');
-          item.className = `daily-item`;
-          item.innerHTML = `
-            <div class="player-info">${session.player}</div>
-            <div class="wl-info ${wlClass}">${getWLSummary(session)}</div>
-            <div class="heroes-list">${session.heroes.map(h => h.name).join(' ')}</div>
-          `;
-          card.appendChild(item);
-        });
-        
-        container.appendChild(card);
-      });
-    }
-
-    // Section 3: Player Hero Stats - ✅ 每個英雄獨立勝率
-    function renderPlayerHeroGrid() {
-      const playerHeroStats = {};
+    // Sort Players: Rate -> Pool -> Money -> Total
+    cachedSortedPlayers = Object.keys(stats).map(name => {
+      const p = stats[name];
+      const total = p.wins + p.losses;
+      const rate = total > 0 ? Math.round((p.wins / total) * 100) : 0;
+      const uniqueHeroes = [...new Set(p.heroes)];
+      const heroPool = uniqueHeroes.length;
       
-      rawData.forEach(session => {
-        if (!playerHeroStats[session.player]) {
-          playerHeroStats[session.player] = {};
-        }
-        session.heroes.forEach(hero => {
-          const heroName = hero.name;
-          if (!playerHeroStats[session.player][heroName]) {
-            playerHeroStats[session.player][heroName] = { totalGames: 0, wins: 0 };
-          }
-          playerHeroStats[session.player][heroName].totalGames += 1;
-          if (hero.result === 'W') {
-            playerHeroStats[session.player][heroName].wins += 1;
-          }
-        });
-      });
+      const heroCounts = {};
+      p.heroes.forEach(h => { heroCounts[h] = (heroCounts[h] || 0) + 1; });
+      const top3 = Object.entries(heroCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([hero, count]) => `${hero}(${count})`)
+        .join(", ");
+      
+      return { name, ...p, total, rate, heroPool, top3 };
+    }).sort((a, b) => b.rate - a.rate || b.heroPool - a.heroPool || b.money - a.money || b.total - a.total);
 
-      const container = document.getElementById('playerHeroGrid');
-      container.innerHTML = "";
+    cachedHeroStats = heroStats;
 
-      Object.entries(playerHeroStats).sort((a, b) => {
-        const countA = Object.values(a[1]).reduce((sum, h) => sum + h.totalGames, 0);
-        const countB = Object.values(b[1]).reduce((sum, h) => sum + h.totalGames, 0);
-        return countB - countA;
-      }).forEach(([playerName, heroes]) => {
-        const card = document.createElement('div');
-        card.className = 'player-hero-card';
+    // Render Player Table
+    const tbody = document.getElementById('player-overview-body');
+    tbody.innerHTML = cachedSortedPlayers.map(p => {
+      const moneyClass = p.money >= 0 ? 'plus' : 'minus';
+      const moneySign = p.money >= 0 ? '+' : '';
+      const rateClass = p.rate >= 60 ? 'high' : (p.rate >= 40 ? 'mid' : 'low');
+      const displayMoney = Number.isInteger(p.money) ? p.money : p.money.toFixed(1);
+
+      return `<tr>
+        <td><span class="player-name">${p.name}</span></td>
+        <td>${p.total} <span style="opacity:0.5; font-size:10px">(${p.wins}W/${p.losses}L)</span></td>
+        <td class="win-rate ${rateClass}">${p.rate}%</td>
+        <td>${p.heroPool}</td>
+        <td><div class="top3-heroes">${p.top3}</div></td>
+        <td class="money ${moneyClass}">${moneySign}$${displayMoney}</td>
+      </tr>`;
+    }).join('');
+
+    // Render Team Stats
+    const sortedTeams = Object.keys(teamStats).map(teamKey => {
+      const t = teamStats[teamKey];
+      const rate = t.total > 0 ? Math.round((t.wins / t.total) * 100) : 0;
+      return { teamKey, ...t, rate };
+    }).sort((a, b) => b.rate - a.rate || b.total - a.total);
+
+    const teamTbody = document.getElementById('team-stats-body');
+    teamTbody.innerHTML = sortedTeams.map(t => {
+      const rateClass = t.rate >= 60 ? 'high' : (t.rate >= 40 ? 'mid' : 'low');
+      return `<tr>
+        <td><span class="team-name">${t.teamKey}</span></td>
+        <td>${t.total}</td>
+        <td>${t.wins}W / ${t.losses}L</td>
+        <td class="win-rate ${rateClass}">${t.rate}%</td>
+      </tr>`;
+    }).join('');
+
+    renderHeroes();
+
+    // Render Matches
+    const matchesByDate = {};
+    matches.forEach(m => {
+      const date = m.date.split(' ')[0];
+      if (!matchesByDate[date]) matchesByDate[date] = [];
+      matchesByDate[date].push(m);
+    });
+
+    const matchesList = document.getElementById('matches-list');
+    matchesList.innerHTML = Object.entries(matchesByDate).map(([date, dateMatches]) => {
+      let inner = `<div class="date-group">
+        <div class="date-header">${date}</div>`;
+      
+      dateMatches.forEach(m => {
+        const matchNum = m.date.split(' ')[1];
+        const odaClass = m.winner === "oda" ? "winner" : "loser";
+        const unitedClass = m.winner === "united" ? "winner" : "loser";
+        const odaPlayers = m.oda.map(p => `<div class="match-player"><strong>${p.name}</strong><span>${p.hero}</span></div>`).join('');
+        const unitedPlayers = m.united.map(p => `<div class="match-player"><strong>${p.name}</strong><span>${p.hero}</span></div>`).join('');
         
-        const sortedHeroes = Object.entries(heroes).map(([hero, stats]) => ({
-          hero,
-          totalGames: stats.totalGames,
-          wins: stats.wins,
-          winrate: stats.totalGames ? Math.round(stats.wins / stats.totalGames * 100) : 0
-        })).sort((a, b) => {
-          if (b.totalGames !== a.totalGames) return b.totalGames - a.totalGames;
-          return b.winrate - a.winrate;
-        });
-        
-        card.innerHTML = `<div class="player-name-hero">${playerName}</div>`;
-        
-        sortedHeroes.forEach(h => {
-          const row = document.createElement('div');
-          row.className = 'hero-usage-row';
-          row.innerHTML = `
-            <div class="hero-name-usage">${h.hero}</div>
-            <div class="hero-count-usage">${h.totalGames}次</div>
-            <div class="hero-winrate-usage ${h.winrate >= 50 ? 'good' : 'bad'}">${h.winrate}%</div>
-          `;
-          card.appendChild(row);
-        });
-        
-        container.appendChild(card);
+        inner += `<div class="match-card">
+          <div class="match-header">
+            <span class="match-number">${matchNum}</span>
+            <span class="match-bet">賭注 $${m.bet}</span>
+          </div>
+          <div class="match-teams">
+            <div class="team oda ${odaClass}">
+              <div class="team-header">織田軍</div>
+              ${odaPlayers}
+            </div>
+            <div class="team united ${unitedClass}">
+              <div class="team-header">聯合軍</div>
+              ${unitedPlayers}
+            </div>
+          </div>
+        </div>`;
       });
+      inner += `</div>`;
+      return inner;
+    }).join('');
+
+    document.getElementById('last-update').innerText = new Date().toLocaleString('zh-HK');
+  }
+
+  // New function for sorting heroes
+  function sortHeroes(type) {
+    currentHeroSort = type;
+    document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    renderHeroes();
+  }
+
+  function renderHeroes() {
+    const heroContainer = document.getElementById('hero-stats-container');
+    heroContainer.innerHTML = cachedSortedPlayers.map(player => {
+      const playerHeroes = cachedHeroStats[player.name];
+      if (!playerHeroes) return '';
+      
+      const heroList = Object.entries(playerHeroes)
+        .map(([hero, stats]) => {
+          const total = stats.wins + stats.losses;
+          const rate = total > 0 ? Math.round((stats.wins / total) * 100) : 0;
+          return { hero, ...stats, total, rate };
+        })
+        .sort((a, b) => {
+          if (currentHeroSort === 'count') {
+            return b.total - a.total || b.rate - a.rate;
+          } else {
+            return b.rate - a.rate || b.total - a.total;
+          }
+        });
+      
+      const heroItems = heroList.map(h => {
+        const rateClass = h.rate >= 60 ? 'high' : (h.rate >= 40 ? 'mid' : 'low');
+        return `<div class="hero-item">
+          <span class="hero-name">${h.hero}</span>
+          <div>
+            <span class="hero-stats">${h.total}次 (${h.wins}W-${h.losses}L)</span>
+            <span class="hero-rate ${rateClass}">${h.rate}%</span>
+          </div>
+        </div>`;
+      }).join('');
+      
+      return `<div class="hero-stats-card">
+        <div class="hero-stats-header">${player.name}</div>
+        ${heroItems}
+      </div>`;
+    }).join('');
+  }
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    if (tab === 'players') {
+      document.querySelector('.tab:nth-child(1)').classList.add('active');
+      document.getElementById('players-tab').classList.add('active');
+    } else {
+      document.querySelector('.tab:nth-child(2)').classList.add('active');
+      document.getElementById('matches-tab').classList.add('active');
     }
+  }
 
-    // Initialize
-    initTabs();
-    renderOverviewTable();
-    renderDailyGrid();
-    renderPlayerHeroGrid();
-  </script>
+  renderSite();
+</script>
+
 </body>
 </html>
