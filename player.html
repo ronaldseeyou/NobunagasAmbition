@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <title>信長之野望 戰績統計 v6</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #020617; --card: #111827; --header-bg: #030712;
+      --border: #1f2937; --accent: #38bdf8; --text: #e5e7eb;
+      --muted: #6b7280; --win: #4ade80; --lose: #f97373;
+      --money: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      background: radial-gradient(circle at top, #0b1120 0, #020617 50%, #000 100%);
+      color: var(--text); min-height: 100vh; padding-bottom: 100px;
+    }
+    
+    header { position: sticky; top: 0; z-index: 10; padding: 16px; border-bottom: 1px solid var(--border); background: rgba(3,7,18,0.98); backdrop-filter: blur(20px); }
+    h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+    h2 { font-size: 16px; font-weight: 600; color: var(--accent); margin: 32px 0 16px; }
+
+    .tab-container { 
+      background: var(--card); border-radius: 16px; margin-bottom: 24px; 
+      border: 1px solid var(--border); overflow: hidden; 
+    }
+    .tab-buttons {
+      display: flex; background: var(--header-bg); border-bottom: 1px solid var(--border);
+    }
+    .tab-btn {
+      flex: 1; padding: 16px; text-align: center; font-weight: 600; font-size: 15px;
+      color: var(--muted); border: none; background: none; cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .tab-btn.active {
+      color: var(--accent); background: rgba(56,189,248,0.1);
+    }
+    .tab-content {
+      display: none; padding: 24px; min-height: 400px;
+    }
+    .tab-content.active { display: block; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 16px; }
+
+    .overview-table { background: var(--card); border-radius: 16px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 24px; box-shadow: 0 12px 40px rgba(0,0,0,0.6); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 14px 12px; border-bottom: 1px solid rgba(31,41,55,0.6); text-align: center; }
+    th { background: var(--header-bg); color: var(--muted); font-weight: 500; font-size: 12px; }
+    tr:hover td { background: rgba(15,23,42,0.6); }
+    .player-name-col { text-align: left; min-width: 100px; }
+    .player-name { font-weight: 700; }
+    .winrate.good { color: var(--win); font-weight: 700; }
+    .winrate.bad { color: var(--lose); font-weight: 700; }
+    .money.good { color: var(--money); font-weight: 700; }
+    .money.bad { color: var(--lose); font-weight: 700; }
+    .top-heroes { font-size: 12px; text-align: left; color: var(--muted); }
+
+    .daily-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px; margin-bottom: 24px;
+    }
+    .daily-card {
+      background: var(--card); border-radius: 16px; padding: 20px;
+      border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .daily-header { 
+      font-weight: 700; font-size: 20px; margin-bottom: 16px; color: var(--accent);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .daily-money { 
+      font-weight: 700; font-size: 16px; padding: 8px 12px; border-radius: 20px;
+      min-width: 80px; text-align: center;
+    }
+    .daily-money.win { background: rgba(74,222,128,0.25); color: var(--win); border: 1px solid rgba(74,222,128,0.4); }
+    .daily-money.lose { background: rgba(249,115,115,0.25); color: var(--lose); border: 1px solid rgba(249,115,115,0.4); }
+    .daily-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px; background: rgba(15,23,42,0.6); border-radius: 12px;
+      border: 1px solid rgba(31,41,55,0.8); margin-bottom: 8px;
+    }
+    .daily-item:last-child { margin-bottom: 0; }
+    .player-info { font-weight: 500; }
+    .wl-info { font-weight: 600; }
+    .wl-info.win { color: var(--win); }
+    .wl-info.lose { color: var(--lose); }
+    .wl-info.mixed { 
+      background: linear-gradient(90deg, var(--win) 50%, var(--lose) 50%); 
+      -webkit-background-clip: text; 
+      -webkit-text-fill-color: transparent; 
+      background-clip: text;
+      font-weight: 700;
+    }
+    .heroes-list { font-size: 12px; color: var(--muted); }
+
+    .player-hero-section { background: var(--card); border-radius: 16px; padding: 20px; border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.4); margin-bottom: 24px; }
+    .player-hero-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;
+    }
+    .player-hero-card {
+      background: rgba(15,23,42,0.6); border-radius: 12px; padding: 16px;
+      border: 1px solid rgba(31,41,55,0.8);
+    }
+    .player-name-hero { font-weight: 700; font-size: 16px; margin-bottom: 12px; color: var(--accent); }
+    .hero-usage-row { 
+      display: grid; grid-template-columns: 2fr 1fr 1fr; 
+      gap: 12px; padding: 8px 0; border-bottom: 1px solid rgba(31,41,55,0.4); font-size: 13px;
+    }
+    .hero-usage-row:last-child { border-bottom: none; }
+    .hero-name-usage { font-weight: 500; }
+    .hero-count-usage { font-weight: 700; color: var(--accent); text-align: center; }
+    .hero-winrate-usage { font-weight: 600; text-align: center; }
+    .hero-winrate-usage.good { color: var(--win); }
+    .hero-winrate-usage.bad { color: var(--lose); }
+
+    .bottom-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 16px;
+      background: rgba(3,7,18,0.98); backdrop-filter: blur(20px); border-top: 1px solid var(--border);
+      font-size: 12px; color: var(--muted); display: flex; justify-content: space-between;
+    }
+
+    @media (max-width: 640px) {
+      .tab-buttons { flex-direction: column; }
+      .tab-btn { padding: 20px 16px; border-bottom: 1px solid rgba(31,41,55,0.3); }
+      .daily-grid, .player-hero-grid { grid-template-columns: 1fr; }
+      .hero-usage-row { grid-template-columns: 1fr; text-align: left; gap: 8px; }
+      table { font-size: 13px; }
+      th, td { padding: 12px 8px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>信長之野望 戰績統計 v6</h1>
+    <p>玩家總覽 → 每日對戰($) → 玩家英雄勝率</p>
+  </header>
+
+  <main>
+    <div class="tab-container">
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-tab="players">👥 玩家</button>
+        <button class="tab-btn" data-tab="daily">📅 每日對戰</button>
+      </div>
+      
+      <div class="tab-content active" id="players">
+        <h2>玩家總覽（勝率→英雄池排序）</h2>
+        <div class="overview-table">
+          <table id="overviewTable">
+            <thead>
+              <tr>
+                <th class="player-name-col">玩家</th>
+                <th>總場數</th>
+                <th>勝率</th>
+                <th>英雄池</th>
+                <th>最常用Top3</th>
+                <th>總金額</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <h2>🎯 玩家英雄勝率</h2>
+        <div class="player-hero-section">
+          <div class="player-hero-grid" id="playerHeroGrid"></div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="daily">
+        <div class="daily-grid" id="dailyGrid"></div>
+      </div>
+    </div>
+  </main>
+
+  <div class="bottom-bar">
+    <div>✅ iPhone Safari 完美支援</div>
+    <div>總玩家 <span id="playerCount">0</span> | 總對戰 <span id="totalSessions">0</span></div>
+  </div>
+
+  <script>
+    // ✅ 修正數據 - 2月1 water只玩1場，其他玩3場；子誠2月7-8修正
+    const rawData = [
+      // === 2月1日 - water 1場，其他3場 ===
+      { player: "water", date: "2月1", heroes: [{name: "山王", result: "W"}] },                    // 1場
+      { player: "杜演", date: "2月1", heroes: [
+        {name: "利家", result: "W"}, {name: "森仔", result: "L"}, {name: "村上", result: "W"}, {name: "肥川", result: "L"}
+      ] },  // 3場
+      { player: "woman", date: "2月1", heroes: [{name: "森仔", result: "W"}] },                    // 1場
+      { player: "俊", date: "2月1", heroes: [{name: "信長", result: "W"}, {name: "慶次", result: "W"}] },  // 2場
+      { player: "哲", date: "2月1", heroes: [
+        {name: "肥川", result: "L"}, {name: "松姬", result: "L"}, {name: "果心", result: "W"}, 
+        {name: "果心", result: "W"}, {name: "森仔", result: "W"}, {name: "信長", result: "W"}
+      ] },  // 3場
+      { player: "子誠", date: "2月1", heroes: [
+        {name: "三好", result: "L"}, {name: "稻姬", result: "L"}, {name: "牛牛", result: "L"}
+      ] },  // 3場
+      { player: "傑", date: "2月1", heroes: [
+        {name: "jj佬", result: "L"}, {name: "百地", result: "L"}
+      ] },  // 2場
+
+      // === 2月7-8 - 子誠修正 ===
+      { player: "water", date: "2月7", heroes: [{name: "直江", result: "W"}, {name: "信長", result: "W"}] },
+      { player: "子誠", date: "2月7", heroes: [{name: "義龍", result: "L"}, {name: "果心", result: "L"}] },     // 2輸 = -300
+      { player: "woman", date: "2月7", heroes: [{name: "馬場", result: "W"}, {name: "森仔", result: "W"}] },
+      { player: "杜演", date: "2月7", heroes: [{name: "偷錢佬", result: "L"}, {name: "肥川", result: "L"}] },
+      { player: "哲", date: "2月7", heroes: [{name: "三好", result: "W"}, {name: "義龍", result: "W"}] },
+      { player: "傑", date: "2月7", heroes: [{name: "JJ佬", result: "L"}, {name: "百地", result: "L"}] },
+
+      { player: "子誠", date: "2月8", heroes: [{name: "瀧川", result: "W"}, {name: "風魔", result: "L"}, {name: "濃姬", result: "W"}] },  // 2贏1輸 = +150
+      { player: "woman", date: "2月8", heroes: [{name: "肥川", result: "L"}, {name: "酒井", result: "W"}, {name: "馬場", result: "L"}] },
+      { player: "杜演", date: "2月8", heroes: [{name: "森仔", result: "W"}, {name: "牛牛", result: "L"}, {name: "利家", result: "W"}] },
+      { player: "哲", date: "2月8", heroes: [{name: "直江", result: "L"}, {name: "佐佐", result: "W"}, {name: "勝賴", result: "L"}] },
+      { player: "俊", date: "2月8", heroes: [{name: "義龍", result: "L"}, {name: "羽柴", result: "W"}, {name: "光秀", result: "L"}] },
+      { player: "傑", date: "2月8", heroes: [{name: "酒井", result: "W"}, {name: "道雪", result: "L"}, {name: "單乳", result: "W"}] }
+    ];
+
+    function computeMoney(session) {
+      const wins = session.heroes.filter(h => h.result === 'W').length;
+      const losses = session.heroes.filter(h => h.result === 'L').length;
+      return wins * 150 - losses * 150;
+    }
+
+    function getWLSummary(session) {
+      const wins = session.heroes.filter(h => h.result === 'W').length;
+      const losses = session.heroes.filter(h => h.result === 'L').length;
+      return `${wins}贏/${losses}輸`;
+    }
+
+    // Tab System
+    function initTabs() {
+      const tabs = document.querySelectorAll('.tab-btn');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const target = tab.dataset.tab;
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          document.getElementById(target).classList.add('active');
+        });
+      });
+    }
+
+    // Section 1: Player Overview - ✅ 金錢重新計算
+    function renderOverviewTable() {
+      const players = {};
+      rawData.forEach(session => {
+        if (!players[session.player]) {
+          players[session.player] = { totalGames: 0, totalWins: 0, totalLosses: 0, totalMoney: 0, heroUsage: {} };
+        }
+        const p = players[session.player];
+        const wins = session.heroes.filter(h => h.result === 'W').length;
+        const losses = session.heroes.filter(h => h.result === 'L').length;
+        p.totalGames += wins + losses;
+        p.totalWins += wins;
+        p.totalLosses += losses;
+        p.totalMoney += computeMoney(session);
+        session.heroes.forEach(h => {
+          p.heroUsage[h.name] = (p.heroUsage[h.name] || 0) + 1;
+        });
+      });
+
+      const playerStats = Object.entries(players).map(([name, stats]) => {
+        const topHeroes = Object.entries(stats.heroUsage)
+          .sort(([,a], [,b]) => b - a).slice(0, 3).map(([h]) => h);
+        return {
+          name, ...stats,
+          winrate: stats.totalGames ? Math.round(stats.totalWins / stats.totalGames * 100) : 0,
+          heroCount: Object.keys(stats.heroUsage).length,
+          topHeroes: topHeroes.join(' ')
+        };
+      }).sort((a, b) => {
+        if (b.winrate !== a.winrate) return b.winrate - a.winrate;
+        if (b.heroCount !== a.heroCount) return b.heroCount - a.heroCount;
+        return b.totalGames - a.totalGames;
+      });
+
+      const tbody = document.querySelector("#overviewTable tbody");
+      tbody.innerHTML = "";
+      playerStats.forEach(p => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="player-name-col player-name">${p.name}</td>
+          <td>${p.totalGames}</td>
+          <td class="winrate ${p.winrate >= 50 ? 'good' : 'bad'}">${p.winrate}%</td>
+          <td>${p.heroCount}</td>
+          <td class="top-heroes">${p.topHeroes || '—'}</td>
+          <td class="money ${p.totalMoney >= 0 ? 'good' : 'bad'}">${p.totalMoney >= 0 ? '+' : ''}$${Math.round(p.totalMoney)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('playerCount').textContent = playerStats.length;
+      document.getElementById('totalSessions').textContent = rawData.length;
+    }
+
+    // Section 2: Daily Grid - ✅ 顯示實際session金錢
+    function renderDailyGrid() {
+      const days = {};
+      rawData.forEach(session => {
+        if (!days[session.date]) days[session.date] = [];
+        days[session.date].push(session);
+      });
+
+      const sortedDays = Object.entries(days).sort((a, b) => {
+        const m1 = a[0].match(/(\d+)月(\d+)/);
+        const m2 = b[0].match(/(\d+)月(\d+)/);
+        const d1 = m1 ? parseInt(m1[1]) * 100 + parseInt(m1[2]) : 0;
+        const d2 = m2 ? parseInt(m2[1]) * 100 + parseInt(m2[2]) : 0;
+        return d2 - d1;
+      });
+
+      const container = document.getElementById('dailyGrid');
+      container.innerHTML = "";
+
+      sortedDays.forEach(([date, sessions]) => {
+        const totalDayMoney = sessions.reduce((sum, s) => sum + computeMoney(s), 0);
+        const card = document.createElement('div');
+        card.className = 'daily-card';
+        const moneyClass = totalDayMoney >= 0 ? 'win' : 'lose';
+        card.innerHTML = `
+          <div class="daily-header">
+            <span>${date}</span>
+            <span class="daily-money ${moneyClass}">+$${Math.round(totalDayMoney)}</span>
+          </div>
+        `;
+        
+        sessions.forEach(session => {
+          const wins = session.heroes.filter(h => h.result === 'W').length;
+          const losses = session.heroes.filter(h => h.result === 'L').length;
+          
+          let wlClass = 'win';
+          if (losses > 0 && wins > 0) wlClass = 'mixed';
+          else if (losses > 0) wlClass = 'lose';
+          
+          const item = document.createElement('div');
+          item.className = `daily-item`;
+          item.innerHTML = `
+            <div class="player-info">${session.player}</div>
+            <div class="wl-info ${wlClass}">${getWLSummary(session)}</div>
+            <div class="heroes-list">${session.heroes.map(h => h.name).join(' ')}</div>
+          `;
+          card.appendChild(item);
+        });
+        
+        container.appendChild(card);
+      });
+    }
+
+    // Section 3: Player Hero Stats - ✅ 每個英雄獨立勝率
+    function renderPlayerHeroGrid() {
+      const playerHeroStats = {};
+      
+      rawData.forEach(session => {
+        if (!playerHeroStats[session.player]) {
+          playerHeroStats[session.player] = {};
+        }
+        session.heroes.forEach(hero => {
+          const heroName = hero.name;
+          if (!playerHeroStats[session.player][heroName]) {
+            playerHeroStats[session.player][heroName] = { totalGames: 0, wins: 0 };
+          }
+          playerHeroStats[session.player][heroName].totalGames += 1;
+          if (hero.result === 'W') {
+            playerHeroStats[session.player][heroName].wins += 1;
+          }
+        });
+      });
+
+      const container = document.getElementById('playerHeroGrid');
+      container.innerHTML = "";
+
+      Object.entries(playerHeroStats).sort((a, b) => {
+        const countA = Object.values(a[1]).reduce((sum, h) => sum + h.totalGames, 0);
+        const countB = Object.values(b[1]).reduce((sum, h) => sum + h.totalGames, 0);
+        return countB - countA;
+      }).forEach(([playerName, heroes]) => {
+        const card = document.createElement('div');
+        card.className = 'player-hero-card';
+        
+        const sortedHeroes = Object.entries(heroes).map(([hero, stats]) => ({
+          hero,
+          totalGames: stats.totalGames,
+          wins: stats.wins,
+          winrate: stats.totalGames ? Math.round(stats.wins / stats.totalGames * 100) : 0
+        })).sort((a, b) => {
+          if (b.totalGames !== a.totalGames) return b.totalGames - a.totalGames;
+          return b.winrate - a.winrate;
+        });
+        
+        card.innerHTML = `<div class="player-name-hero">${playerName}</div>`;
+        
+        sortedHeroes.forEach(h => {
+          const row = document.createElement('div');
+          row.className = 'hero-usage-row';
+          row.innerHTML = `
+            <div class="hero-name-usage">${h.hero}</div>
+            <div class="hero-count-usage">${h.totalGames}次</div>
+            <div class="hero-winrate-usage ${h.winrate >= 50 ? 'good' : 'bad'}">${h.winrate}%</div>
+          `;
+          card.appendChild(row);
+        });
+        
+        container.appendChild(card);
+      });
+    }
+
+    // Initialize
+    initTabs();
+    renderOverviewTable();
+    renderDailyGrid();
+    renderPlayerHeroGrid();
+  </script>
+</body>
+</html>
