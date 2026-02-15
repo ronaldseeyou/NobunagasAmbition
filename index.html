@@ -2,115 +2,150 @@
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8" />
-  <title>信長之野望 戰績統計 v15</title>
+  <title>信長之野望 戰績統計 v12</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- 引入截圖功能所需的 library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     :root {
-      /* Dark Mode Theme */
-      --bg: #000000; --card: #121212; --header-bg: #0a0a0a;
-      --border: #27272a; --accent: #38bdf8; --text: #e5e7eb;
-      --muted: #a1a1aa; --win: #4ade80; --lose: #ef4444;
-      --money: #fbbf24; --oda: #dc2626; --united: #2563eb;
+      --bg: #020617; --card: #111827; --header-bg: #030712;
+      --border: #1f2937; --accent: #38bdf8; --text: #e5e7eb;
+      --muted: #9ca3af; --win: #4ade80; --lose: #f87171;
+      --money: #fbbf24; --oda: #ef4444; --united: #3b82f6;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text); min-height: 100vh; padding-bottom: 60px;
+      background: radial-gradient(circle at top, #0b1120 0, #020617 50%, #000 100%);
+      color: var(--text); min-height: 100vh; padding-bottom: 80px;
     }
     
-    /* Header 置中 + Icon 加大 */
-    header { position: sticky; top: 0; z-index: 10; padding: 16px 12px; border-bottom: 1px solid var(--border); background: rgba(10,10,10,0.95); backdrop-filter: blur(10px); text-align: center; }
-    .header-content { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-    .header-icon { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 2px solid var(--accent); }
-    h1 { font-size: 18px; font-weight: 700; color: var(--accent); margin: 0; }
-    h2 { font-size: 12px; color: var(--muted); font-weight: 400; margin: 0; }
+    /* Header */
+    header { position: sticky; top: 0; z-index: 10; padding: 16px; border-bottom: 1px solid var(--border); background: rgba(3,7,18,0.95); backdrop-filter: blur(10px); }
+    .header-content { display: flex; align-items: center; gap: 12px; }
+    .header-icon { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; border: 2px solid var(--accent); }
+    .header-text { flex: 1; }
+    h1 { font-size: 20px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+    h2 { font-size: 13px; color: var(--muted); font-weight: 400; }
 
-    .container { max-width: 900px; margin: 0 auto; padding: 12px; }
+    .container { max-width: 900px; margin: 0 auto; padding: 16px; }
     
-    .tabs { display: flex; justify-content: center; gap: 8px; margin: 12px 0; border-bottom: 2px solid var(--border); }
-    .tab { padding: 10px 20px; background: transparent; color: var(--muted); border: none; cursor: pointer; font-size: 14px; font-weight: 500; border-bottom: 2px solid transparent; transition: all 0.2s; }
+    /* Loading State */
+    #loading-state { text-align: center; padding: 40px; color: var(--accent); font-size: 16px; display: none; }
+    #error-state { text-align: center; padding: 40px; color: var(--lose); font-size: 16px; display: none; }
+
+    /* Tabs Style */
+    .tabs { display: flex; gap: 8px; margin: 16px 0; border-bottom: 2px solid var(--border); overflow-x: auto; }
+    .tab { padding: 12px 20px; background: transparent; color: var(--muted); border: none; cursor: pointer; font-size: 15px; font-weight: 500; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; }
     .tab:hover { color: var(--text); }
     .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
     
     .tab-content { display: none; }
     .tab-content.active { display: block; }
     
-    .section-header { display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px; }
-    .section-title { font-size: 15px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 6px; }
+    .section-title { margin: 24px 0 12px; font-size: 16px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 8px; }
     
-    /* 陣營勝率 (動態顏色) */
-    .faction-stats { background: var(--card); border-radius: 10px; border: 1px solid var(--border); padding: 16px; margin-bottom: 18px; }
-    .faction-header { font-size: 12px; color: var(--muted); margin-bottom: 10px; text-align: center; }
-    .faction-bar-container { display: flex; height: 40px; border-radius: 6px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-    .faction-bar { display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; transition: all 0.3s; position: relative; color: #fff; }
-    /* 顏色會由 JS 動態控制 */
-    .faction-bar span { z-index: 1; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+    /* Stats & Bars */
+    .faction-stats { background: var(--card); border-radius: 12px; border: 1px solid var(--border); padding: 20px; margin-bottom: 24px; }
+    .faction-header { font-size: 14px; color: var(--muted); margin-bottom: 12px; text-align: center; }
+    .faction-bar-container { display: flex; height: 50px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+    .faction-bar { display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; transition: all 0.3s; position: relative; }
+    .faction-bar.oda { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); }
+    .faction-bar.united { background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); }
+    .faction-bar span { z-index: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
     
-    .table-card { background: var(--card); border-radius: 10px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.1); margin-bottom: 16px; }
-    table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
-    th { background: #18181b; color: var(--muted); font-weight: 500; padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
-    td { padding: 12px; border-bottom: 1px solid var(--border); }
+    /* Table */
+    .table-card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+    th { background: #1f2937; color: var(--muted); font-weight: 500; padding: 10px 14px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { padding: 12px 14px; border-bottom: 1px solid var(--border); }
     tr:last-child td { border-bottom: none; }
-    tr:hover { background: rgba(255, 255, 255, 0.03); }
+    tr:hover { background: rgba(56, 189, 248, 0.05); }
     
-    .player-name { font-weight: 600; color: #fff; display: block; font-size: 13px; }
-    .team-name { font-weight: 600; color: #fff; font-size: 12px; line-height: 1.4; }
-    .top3-heroes { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.3; }
-    
+    .player-name { font-weight: 600; color: #fff; display: block; }
     .win-rate { font-weight: 700; }
     .win-rate.high { color: var(--win); }
     .win-rate.mid { color: var(--money); }
     .win-rate.low { color: var(--lose); }
-    
     .money { font-family: monospace; font-weight: 600; }
     .money.plus { color: var(--win); }
     .money.minus { color: var(--lose); }
 
-    /* Sorting Control */
-    .sort-controls { display: flex; gap: 8px; }
-    .sort-btn { background: #27272a; color: #a1a1aa; border: 1px solid #3f3f46; padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; transition: all 0.2s; }
-    .sort-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
-
-    .hero-stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
-    .hero-stats-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
-    .hero-stats-header { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
-    .hero-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 12px; }
+    /* Hero Stats */
+    .hero-stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .hero-stats-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+    .hero-stats-header { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    .hero-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px; }
     .hero-item:not(:last-child) { border-bottom: 1px solid #1e293b; }
     .hero-name { color: var(--text); font-weight: 500; }
-    .hero-stats { color: var(--muted); font-size: 11px; }
-    .hero-rate { margin-left: 10px; font-weight: 600; }
+    .hero-stats { color: var(--muted); font-size: 12px; }
+    .hero-rate { margin-left: 12px; font-weight: 600; }
     .hero-rate.high { color: var(--win); }
     .hero-rate.mid { color: var(--money); }
     .hero-rate.low { color: var(--lose); }
 
-    .date-group { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 16px; }
-    .date-header { font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
-    
-    .match-card { background: #0a0a0a; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; padding: 12px; }
-    .match-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 12px; padding-bottom: 6px; border-bottom: 1px solid #27272a; }
+    /* Matches List */
+    .date-group { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+    .date-header { font-size: 18px; font-weight: 700; color: var(--accent); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+    .match-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; margin-bottom: 12px; padding: 14px; }
+    .match-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 13px; padding-bottom: 8px; border-bottom: 1px solid #1e293b; }
     .match-number { color: var(--muted); font-weight: 600; }
     .match-bet { color: var(--money); font-weight: 600; }
     
-    .match-teams { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .team { padding: 10px; border-radius: 6px; position: relative; }
-    .team.oda { border: 1px solid rgba(220, 38, 38, 0.4); }
-    .team.united { border: 1px solid rgba(37, 99, 235, 0.4); }
+    .match-teams { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .team { padding: 10px; border-radius: 8px; }
+    .team.oda { border: 1px solid rgba(239, 68, 68, 0.3); }
+    .team.united { border: 1px solid rgba(59, 130, 246, 0.3); }
+    .team.oda.winner, .team.united.winner { background: rgba(74, 222, 128, 0.15); border-color: rgba(74, 222, 128, 0.4); }
+    .team.oda.loser, .team.united.loser { background: rgba(248, 113, 113, 0.15); border-color: rgba(248, 113, 113, 0.4); }
     
-    .team.oda.winner,
-    .team.united.winner { background: rgba(74, 222, 128, 0.1); border-color: rgba(74, 222, 128, 0.5); }
-    .team.oda.loser,
-    .team.united.loser { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.5); }
-    
-    .team-header { font-size: 14px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; display: flex; align-items: center; gap: 6px; color: #fff; text-shadow: 0 1px 2px #000; }
+    .team-header { font-size: 13px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+    .team.oda .team-header { color: var(--oda); }
+    .team.united .team-header { color: var(--united); }
     .team.winner .team-header::before { content: "✅"; }
-    .team.loser .team-header::before { content: "❌"; opacity: 0.7; }
+    .team.loser .team-header::before { content: "❌"; opacity: 0.5; }
     
-    .match-player { font-size: 12px; margin-bottom: 4px; line-height: 1.4; padding: 3px 0; }
+    .match-player { font-size: 13px; margin-bottom: 6px; line-height: 1.5; padding: 4px 0; }
     .match-player strong { color: var(--text); font-weight: 600; }
-    .match-player span { opacity: 0.7; font-size: 11px; margin-left: 5px; }
+    .match-player span { opacity: 0.7; font-size: 12px; margin-left: 6px; }
 
-    footer { text-align: center; font-size: 11px; color: var(--muted); margin-top: 30px; opacity: 0.5; }
+    /* Tools Tab Styles */
+    .tools-card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); padding: 24px; margin-bottom: 20px; }
+    .tools-title { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid var(--border); }
+    
+    .player-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .player-checkbox { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #0f172a; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+    .player-checkbox:hover { border-color: var(--accent); }
+    .player-checkbox.selected { border-color: var(--accent); background: rgba(56, 189, 248, 0.1); }
+    .player-checkbox input[type="checkbox"] { cursor: pointer; }
+    .player-checkbox label { cursor: pointer; font-size: 14px; font-weight: 500; }
+    
+    .btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    .btn:active { transform: translateY(0); }
+    .btn-primary { background: linear-gradient(135deg, var(--accent) 0%, #0ea5e9 100%); color: #fff; }
+    .btn-secondary { background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%); color: #fff; }
+    
+    #team-result-container { margin-top: 24px; display: none; }
+    .team-display { background: var(--card); border-radius: 12px; border: 1px solid var(--border); padding: 24px; margin-bottom: 20px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); }
+    .team-display-header { text-align: center; font-size: 20px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+    .team-display-date { text-align: center; font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+    .teams-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .team-box { padding: 20px; border-radius: 10px; }
+    .team-box.oda { background: rgba(239, 68, 68, 0.1); border: 2px solid var(--oda); }
+    .team-box.united { background: rgba(59, 130, 246, 0.1); border: 2px solid var(--united); }
+    .team-box-title { font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
+    .team-box.oda .team-box-title { color: var(--oda); }
+    .team-box.united .team-box-title { color: var(--united); }
+    .team-box-player { padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px; margin-bottom: 8px; text-align: center; font-size: 16px; font-weight: 600; color: #fff; }
+    
+    .action-buttons { display: flex; justify-content: center; gap: 12px; margin-top: 20px; }
+
+    footer { text-align: center; font-size: 12px; color: var(--muted); margin-top: 40px; opacity: 0.5; }
+
+    @media (max-width: 768px) {
+      .teams-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -118,7 +153,7 @@
 <header>
   <div class="container">
     <div class="header-content">
-      <img src="https://raw.githubusercontent.com/ronaldseeyou/NobunagasAmbition/main/images/p4JFAns.jpg" alt="Logo" class="header-icon">
+      <img src="images/p4JFAns.jpg" alt="Logo" class="header-icon" onerror="this.src='https://via.placeholder.com/40'">
       <div class="header-text">
         <h1>⚔️ 信長之野望 戰績網</h1>
         <h2>即時統計 / 陣營對抗 / 英雄數據</h2>
@@ -128,385 +163,269 @@
 </header>
 
 <div class="container">
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('players')">👥 玩家</button>
-    <button class="tab" onclick="switchTab('matches')">📅 每日對戰</button>
-  </div>
+  <!-- Loading State -->
+  <div id="loading-state">⏳ 正在從 Google Sheets 載入數據...</div>
+  <div id="error-state">❌ 無法載入數據，請檢查網絡或 Google Sheet 設定。</div>
 
-  <div id="players-tab" class="tab-content active">
-    <!-- 陣營勝率 -->
-    <div class="section-title">⚔️ 陣營勝率</div>
-    <div class="faction-stats">
-      <div class="faction-header">總共 <span id="total-matches">0</span> 場對戰</div>
-      <div class="faction-bar-container">
-        <div class="faction-bar" id="oda-bar">
-          <span id="oda-text">織田軍 0%</span>
-        </div>
-        <div class="faction-bar" id="united-bar">
-          <span id="united-text">聯合軍 0%</span>
+  <!-- Content (Hidden until loaded) -->
+  <div id="main-content" style="display: none;">
+    
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('players')">👥 玩家</button>
+      <button class="tab" onclick="switchTab('matches')">📅 每日對戰</button>
+      <button class="tab" onclick="switchTab('tools')">🛠️ 工具</button>
+    </div>
+
+    <!-- Players Tab -->
+    <div id="players-tab" class="tab-content active">
+      <div class="section-title">⚔️ 陣營勝率</div>
+      <div class="faction-stats">
+        <div class="faction-header">總共 <span id="total-matches">0</span> 場對戰</div>
+        <div class="faction-bar-container">
+          <div class="faction-bar oda" id="oda-bar">
+            <span id="oda-text">織田軍 0%</span>
+          </div>
+          <div class="faction-bar united" id="united-bar">
+            <span id="united-text">聯合軍 0%</span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="section-title">🏆 玩家總覽</div>
-    <div class="table-card">
-      <table>
-        <thead>
-          <tr>
-            <th>玩家</th>
-            <th>場數 (W/L)</th>
-            <th>勝率</th>
-            <th>英雄池</th>
-            <th>最常用Top3英雄</th>
-            <th>總金額</th>
-          </tr>
-        </thead>
-        <tbody id="player-overview-body"></tbody>
-      </table>
-    </div>
+      <div class="section-title">🏆 玩家總覽</div>
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>玩家</th>
+              <th>場數 (W/L)</th>
+              <th>勝率</th>
+              <th>英雄池</th>
+              <th>總金額</th>
+            </tr>
+          </thead>
+          <tbody id="player-overview-body"></tbody>
+        </table>
+      </div>
 
-    <div class="section-title">🤝 組隊勝率 (3人組)</div>
-    <div class="table-card">
-      <table>
-        <thead>
-          <tr>
-            <th>隊伍組合</th>
-            <th>總場次</th>
-            <th>戰績 (W/L)</th>
-            <th>勝率</th>
-          </tr>
-        </thead>
-        <tbody id="team-stats-body"></tbody>
-      </table>
-    </div>
-
-    <!-- 玩家英雄勝率 (新增 Sorting) -->
-    <div class="section-header">
       <div class="section-title">🎯 玩家英雄勝率</div>
-      <div class="sort-controls">
-        <button class="sort-btn active" onclick="sortHeroes('count')">按次數</button>
-        <button class="sort-btn" onclick="sortHeroes('rate')">按勝率</button>
+      <div class="hero-stats-grid" id="hero-stats-container"></div>
+    </div>
+
+    <!-- Matches Tab -->
+    <div id="matches-tab" class="tab-content">
+      <div class="section-title">📅 對戰歷史</div>
+      <div id="matches-list"></div>
+    </div>
+
+    <!-- Tools Tab -->
+    <div id="tools-tab" class="tab-content">
+      <div class="section-title">🎲 隨機分隊工具</div>
+      <div class="tools-card">
+        <div class="tools-title">參加玩家 (請選擇 6 位)</div>
+        <div class="player-grid" id="player-selection"></div>
+        <div style="text-align: center;">
+          <button class="btn btn-primary" onclick="randomTeams()">🎲 隨機分隊</button>
+        </div>
+      </div>
+      
+      <div id="team-result-container">
+        <div class="team-display" id="capture-area">
+          <!-- Result will be injected here -->
+        </div>
+        <div class="action-buttons">
+          <button class="btn btn-primary" onclick="randomTeams()">🎲 重新分隊</button>
+          <button class="btn btn-secondary" onclick="captureImage()">📸 儲存圖片分享</button>
+        </div>
       </div>
     </div>
-    <div class="hero-stats-grid" id="hero-stats-container"></div>
-  </div>
 
-  <div id="matches-tab" class="tab-content">
-    <div class="section-title">📅 對戰歷史</div>
-    <div id="matches-list"></div>
+    <footer>
+      Last Updated: <span id="last-update"></span>
+    </footer>
   </div>
-
-  <footer>
-    Last Updated: <span id="last-update"></span>
-  </footer>
 </div>
 
 <script>
-  const matches = [
-    {
-      date: "2月1日 第1場", bet: 150, winner: "oda",
-      oda: [
-        { name: "Water", hero: "山王" },
-        { name: "杜演", hero: "利家" },
-        { name: "Woman", hero: "森仔" },
-        { name: "俊", hero: "信長" }
-      ],
-      united: [
-        { name: "哲", hero: "肥川" },
-        { name: "傑", hero: "松姬" },
-        { name: "子誠", hero: "三好" }
-      ]
-    },
-    {
-      date: "2月1日 第2場", bet: 150, winner: "united",
-      oda: [
-        { name: "Woman", hero: "森仔" },
-        { name: "傑", hero: "JJ佬" },
-        { name: "子誠", hero: "稻姬" }
-      ],
-      united: [
-        { name: "哲", hero: "果心" },
-        { name: "俊", hero: "慶次" },
-        { name: "杜演", hero: "村上" }
-      ]
-    },
-    {
-      date: "2月1日 第3場", bet: 150, winner: "oda",
-      oda: [
-        { name: "哲", hero: "果心" },
-        { name: "杜演", hero: "森仔" },
-        { name: "俊", hero: "信長" }
-      ],
-      united: [
-        { name: "傑", hero: "百地" },
-        { name: "Woman", hero: "肥川" },
-        { name: "子誠", hero: "牛牛" }
-      ]
-    },
-    {
-      date: "2月7日 第1場", bet: 150, winner: "united",
-      oda: [
-        { name: "子誠", hero: "義龍" },
-        { name: "杜演", hero: "偷錢佬" },
-        { name: "傑", hero: "JJ佬" }
-      ],
-      united: [
-        { name: "Water", hero: "直江" },
-        { name: "哲", hero: "三好" },
-        { name: "Woman", hero: "馬場" }
-      ]
-    },
-    {
-      date: "2月7日 第2場", bet: 150, winner: "oda",
-      oda: [
-        { name: "Water", hero: "信長" },
-        { name: "哲", hero: "義龍" },
-        { name: "Woman", hero: "森仔" }
-      ],
-      united: [
-        { name: "子誠", hero: "果心" },
-        { name: "杜演", hero: "肥川" },
-        { name: "傑", hero: "百地" }
-      ]
-    },
-    {
-      date: "2月8日 第1場", bet: 200, winner: "oda",
-      oda: [
-        { name: "子誠", hero: "瀧川" },
-        { name: "杜演", hero: "森仔" },
-        { name: "傑", hero: "酒井" }
-      ],
-      united: [
-        { name: "哲", hero: "直江" },
-        { name: "Woman", hero: "肥川" },
-        { name: "俊", hero: "義龍" }
-      ]
-    },
-    {
-      date: "2月8日 第2場", bet: 200, winner: "oda",
-      oda: [
-        { name: "哲", hero: "佐佐" },
-        { name: "Woman", hero: "酒井" },
-        { name: "俊", hero: "羽柴" }
-      ],
-      united: [
-        { name: "子誠", hero: "風魔" },
-        { name: "杜演", hero: "牛牛" },
-        { name: "傑", hero: "道雪" }
-      ]
-    },
-    {
-      date: "2月8日 第3場", bet: 200, winner: "oda",
-      oda: [
-        { name: "子誠", hero: "濃姬" },
-        { name: "杜演", hero: "利家" },
-        { name: "傑", hero: "單羽" }
-      ],
-      united: [
-        { name: "哲", hero: "勝賴" },
-        { name: "Woman", hero: "馬場" },
-        { name: "俊", hero: "光秀" }
-      ]
-    }
-  ];
+  // ==========================================
+  // CONFIGURATION
+  // ==========================================
+  const SHEET_ID = '1dTL4GswalL2faUeKUfe0NhNuj39RmodSa7zBNjVTM-U';
+  const SHEET_NAME = 'Sheet1'; // Default sheet name
+  
+  // URL to fetch data as CSV
+  const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${SHEET_NAME}`;
 
-  let currentHeroSort = 'count'; // 'count' or 'rate'
-  let cachedSortedPlayers = [];
-  let cachedHeroStats = {};
+  let matches = []; // Will be populated from Google Sheets
+  let allPlayers = new Set(); // To store unique player names for the tool
+
+  // ==========================================
+  // 1. DATA FETCHING & PARSING
+  // ==========================================
+  
+  async function loadData() {
+    const loadingEl = document.getElementById('loading-state');
+    const mainContentEl = document.getElementById('main-content');
+    const errorEl = document.getElementById('error-state');
+
+    loadingEl.style.display = 'block';
+
+    try {
+      const response = await fetch(CSV_URL);
+      if (!response.ok) throw new Error('Network response was not ok');
+      const csvText = await response.text();
+      
+      matches = parseCSV(csvText);
+      
+      // Update UI
+      loadingEl.style.display = 'none';
+      mainContentEl.style.display = 'block';
+      
+      renderSite();
+      initPlayerSelection(); // Init tool after data is loaded
+      
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      loadingEl.style.display = 'none';
+      errorEl.style.display = 'block';
+    }
+  }
+
+  function parseCSV(csvText) {
+    const rows = csvText.split('\n').map(row => {
+      // Handle CSV parsing (simple split by comma, handling quotes if necessary)
+      // Since Google Sheets CSV export is reliable, we can use a regex to handle quotes
+      const regex = /(".*?"|[^",\s]+)(?=\s*,|\s*$)/g;
+      // Simple split usually works for simple data, but let's be safer for quotes
+      let matches = [];
+      let match;
+      // Remove surrounding quotes if present
+      const clean = (str) => str ? str.replace(/^"|"$/g, '').trim() : '';
+      
+      const columns = row.split(',').map(clean); 
+      return columns;
+    });
+
+    // Remove Header
+    const dataRows = rows.slice(1);
+    
+    // Group by Match (Date + Match Name)
+    const matchesMap = {};
+
+    dataRows.forEach(row => {
+      if (row.length < 7) return; // Skip empty or malformed rows
+
+      // Mapping based on your requested columns:
+      // 0: Date, 1: Match, 2: Bet, 3: Winner, 4: Side, 5: Player, 6: Hero
+      const date = row[0];
+      const matchName = row[1]; // e.g., "第1場"
+      const bet = parseInt(row[2]) || 0;
+      const winner = row[3].toLowerCase(); // "oda" or "united"
+      const side = row[4].toLowerCase(); // "oda" or "united"
+      const playerName = row[5];
+      const hero = row[6];
+
+      if (!date || !playerName) return;
+
+      const matchKey = `${date}-${matchName}`;
+      
+      // Initialize match object if not exists
+      if (!matchesMap[matchKey]) {
+        matchesMap[matchKey] = {
+          date: `${date} ${matchName}`,
+          bet: bet,
+          winner: winner,
+          oda: [],
+          united: []
+        };
+      }
+
+      // Add player to correct side
+      if (side === 'oda') {
+        matchesMap[matchKey].oda.push({ name: playerName, hero: hero });
+      } else {
+        matchesMap[matchKey].united.push({ name: playerName, hero: hero });
+      }
+
+      // Collect unique player names for the tool
+      allPlayers.add(playerName);
+    });
+
+    return Object.values(matchesMap);
+  }
+
+  // ==========================================
+  // 2. MAIN LOGIC (RENDER)
+  // ==========================================
 
   function renderSite() {
+    // --- Stats Calculation ---
     const stats = {};
     const heroStats = {};
-    const teamStats = {};
-
     const odaWins = matches.filter(m => m.winner === "oda").length;
     const unitedWins = matches.filter(m => m.winner === "united").length;
     const total = matches.length;
-    const odaPercent = Math.round((odaWins / total) * 100);
-    const unitedPercent = Math.round((unitedWins / total) * 100);
-
+    
+    // Faction Bars
+    const odaPercent = total > 0 ? Math.round((odaWins / total) * 100) : 0;
+    const unitedPercent = total > 0 ? Math.round((unitedWins / total) * 100) : 0;
+    
     document.getElementById('total-matches').innerText = total;
-    
-    // Dynamic Faction Colors
-    const odaBar = document.getElementById('oda-bar');
-    const unitedBar = document.getElementById('united-bar');
-    
-    odaBar.style.width = odaPercent + '%';
-    unitedBar.style.width = unitedPercent + '%';
+    document.getElementById('oda-bar').style.width = odaPercent + '%';
+    document.getElementById('united-bar').style.width = unitedPercent + '%';
     document.getElementById('oda-text').innerText = `織田軍 ${odaPercent}%`;
     document.getElementById('united-text').innerText = `聯合軍 ${unitedPercent}%`;
 
-    // High Win Rate = Green, Low = Red
-    if (odaPercent >= 50) {
-      odaBar.style.background = "var(--win)";
-      unitedBar.style.background = "var(--lose)";
-    } else {
-      odaBar.style.background = "var(--lose)";
-      unitedBar.style.background = "var(--win)";
-    }
-
+    // Process Matches
     matches.forEach(match => {
-      const bet = match.bet;
       const isOdaWin = match.winner === "oda";
-      const winningTeam = isOdaWin ? match.oda : match.united;
-      const losingTeam = isOdaWin ? match.united : match.oda;
-
-      const totalPot = losingTeam.length * bet;
-      const winAmount = totalPot / winningTeam.length;
-      const loseAmount = bet;
-
-      [
-        { team: match.oda, won: isOdaWin },
-        { team: match.united, won: !isOdaWin }
-      ].forEach(({ team, won }) => {
-        if (team.length === 3) {
-          const names = team.map(p => p.name).sort();
-          const teamKey = names.join(" & ");
-          if (!teamStats[teamKey]) teamStats[teamKey] = { wins: 0, losses: 0, total: 0 };
-          teamStats[teamKey].total++;
-          if (won) teamStats[teamKey].wins++;
-          else teamStats[teamKey].losses++;
-        }
-      });
-
-      winningTeam.forEach(p => {
-        if (!stats[p.name]) stats[p.name] = { wins: 0, losses: 0, money: 0, heroes: [] };
-        stats[p.name].wins++;
-        stats[p.name].money += winAmount;
-        stats[p.name].heroes.push(p.hero);
-
-        if (!heroStats[p.name]) heroStats[p.name] = {};
-        if (!heroStats[p.name][p.hero]) heroStats[p.name][p.hero] = { wins: 0, losses: 0 };
-        heroStats[p.name][p.hero].wins++;
-      });
-
-      losingTeam.forEach(p => {
-        if (!stats[p.name]) stats[p.name] = { wins: 0, losses: 0, money: 0, heroes: [] };
-        stats[p.name].losses++;
-        stats[p.name].money -= loseAmount;
-        stats[p.name].heroes.push(p.hero);
-
-        if (!heroStats[p.name]) heroStats[p.name] = {};
-        if (!heroStats[p.name][p.hero]) heroStats[p.name][p.hero] = { wins: 0, losses: 0 };
-        heroStats[p.name][p.hero].losses++;
-      });
+      
+      match.oda.forEach(p => processPlayer(p, true, isOdaWin, match.bet));
+      match.united.forEach(p => processPlayer(p, false, !isOdaWin, match.bet));
     });
 
-    // Sort Players: Rate -> Pool -> Money -> Total
-    cachedSortedPlayers = Object.keys(stats).map(name => {
+    function processPlayer(p, isOda, isWin, bet) {
+      if (!stats[p.name]) stats[p.name] = { wins: 0, losses: 0, money: 0, heroes: [] };
+      if (isWin) {
+        stats[p.name].wins++;
+        stats[p.name].money += bet;
+      } else {
+        stats[p.name].losses++;
+        stats[p.name].money -= bet;
+      }
+      stats[p.name].heroes.push(p.hero);
+      
+      if (!heroStats[p.name]) heroStats[p.name] = {};
+      if (!heroStats[p.name][p.hero]) heroStats[p.name][p.hero] = { wins: 0, losses: 0 };
+      if (isWin) heroStats[p.name][p.hero].wins++;
+      else heroStats[p.name][p.hero].losses++;
+    }
+
+    // --- Render Player Table ---
+    const sortedPlayers = Object.keys(stats).map(name => {
       const p = stats[name];
       const total = p.wins + p.losses;
       const rate = total > 0 ? Math.round((p.wins / total) * 100) : 0;
       const uniqueHeroes = [...new Set(p.heroes)];
-      const heroPool = uniqueHeroes.length;
-      
-      const heroCounts = {};
-      p.heroes.forEach(h => { heroCounts[h] = (heroCounts[h] || 0) + 1; });
-      const top3 = Object.entries(heroCounts)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .map(([hero, count]) => `${hero}(${count})`)
-        .join(", ");
-      
-      return { name, ...p, total, rate, heroPool, top3 };
-    }).sort((a, b) => b.rate - a.rate || b.heroPool - a.heroPool || b.money - a.money || b.total - a.total);
+      return { name, ...p, total, rate, heroPool: uniqueHeroes.length };
+    }).sort((a, b) => b.rate - a.rate || b.money - a.money);
 
-    cachedHeroStats = heroStats;
-
-    // Render Player Table
-    const tbody = document.getElementById('player-overview-body');
-    tbody.innerHTML = cachedSortedPlayers.map(p => {
+    document.getElementById('player-overview-body').innerHTML = sortedPlayers.map(p => {
       const moneyClass = p.money >= 0 ? 'plus' : 'minus';
       const moneySign = p.money >= 0 ? '+' : '';
       const rateClass = p.rate >= 60 ? 'high' : (p.rate >= 40 ? 'mid' : 'low');
-      const displayMoney = Number.isInteger(p.money) ? p.money : p.money.toFixed(1);
-
       return `<tr>
         <td><span class="player-name">${p.name}</span></td>
-        <td>${p.total} <span style="opacity:0.5; font-size:10px">(${p.wins}W/${p.losses}L)</span></td>
+        <td>${p.total} <span style="opacity:0.5; font-size:11px">(${p.wins}W/${p.losses}L)</span></td>
         <td class="win-rate ${rateClass}">${p.rate}%</td>
         <td>${p.heroPool}</td>
-        <td><div class="top3-heroes">${p.top3}</div></td>
-        <td class="money ${moneyClass}">${moneySign}$${displayMoney}</td>
+        <td class="money ${moneyClass}">${moneySign}$${p.money}</td>
       </tr>`;
     }).join('');
 
-    // Render Team Stats
-    const sortedTeams = Object.keys(teamStats).map(teamKey => {
-      const t = teamStats[teamKey];
-      const rate = t.total > 0 ? Math.round((t.wins / t.total) * 100) : 0;
-      return { teamKey, ...t, rate };
-    }).sort((a, b) => b.rate - a.rate || b.total - a.total);
-
-    const teamTbody = document.getElementById('team-stats-body');
-    teamTbody.innerHTML = sortedTeams.map(t => {
-      const rateClass = t.rate >= 60 ? 'high' : (t.rate >= 40 ? 'mid' : 'low');
-      return `<tr>
-        <td><span class="team-name">${t.teamKey}</span></td>
-        <td>${t.total}</td>
-        <td>${t.wins}W / ${t.losses}L</td>
-        <td class="win-rate ${rateClass}">${t.rate}%</td>
-      </tr>`;
-    }).join('');
-
-    renderHeroes();
-
-    // Render Matches
-    const matchesByDate = {};
-    matches.forEach(m => {
-      const date = m.date.split(' ')[0];
-      if (!matchesByDate[date]) matchesByDate[date] = [];
-      matchesByDate[date].push(m);
-    });
-
-    const matchesList = document.getElementById('matches-list');
-    matchesList.innerHTML = Object.entries(matchesByDate).map(([date, dateMatches]) => {
-      let inner = `<div class="date-group">
-        <div class="date-header">${date}</div>`;
-      
-      dateMatches.forEach(m => {
-        const matchNum = m.date.split(' ')[1];
-        const odaClass = m.winner === "oda" ? "winner" : "loser";
-        const unitedClass = m.winner === "united" ? "winner" : "loser";
-        const odaPlayers = m.oda.map(p => `<div class="match-player"><strong>${p.name}</strong><span>${p.hero}</span></div>`).join('');
-        const unitedPlayers = m.united.map(p => `<div class="match-player"><strong>${p.name}</strong><span>${p.hero}</span></div>`).join('');
-        
-        inner += `<div class="match-card">
-          <div class="match-header">
-            <span class="match-number">${matchNum}</span>
-            <span class="match-bet">賭注 $${m.bet}</span>
-          </div>
-          <div class="match-teams">
-            <div class="team oda ${odaClass}">
-              <div class="team-header">織田軍</div>
-              ${odaPlayers}
-            </div>
-            <div class="team united ${unitedClass}">
-              <div class="team-header">聯合軍</div>
-              ${unitedPlayers}
-            </div>
-          </div>
-        </div>`;
-      });
-      inner += `</div>`;
-      return inner;
-    }).join('');
-
-    document.getElementById('last-update').innerText = new Date().toLocaleString('zh-HK');
-  }
-
-  // New function for sorting heroes
-  function sortHeroes(type) {
-    currentHeroSort = type;
-    document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-    renderHeroes();
-  }
-
-  function renderHeroes() {
-    const heroContainer = document.getElementById('hero-stats-container');
-    heroContainer.innerHTML = cachedSortedPlayers.map(player => {
-      const playerHeroes = cachedHeroStats[player.name];
+    // --- Render Hero Stats ---
+    document.getElementById('hero-stats-container').innerHTML = sortedPlayers.map(player => {
+      const playerHeroes = heroStats[player.name];
       if (!playerHeroes) return '';
       
       const heroList = Object.entries(playerHeroes)
@@ -515,13 +434,7 @@
           const rate = total > 0 ? Math.round((stats.wins / total) * 100) : 0;
           return { hero, ...stats, total, rate };
         })
-        .sort((a, b) => {
-          if (currentHeroSort === 'count') {
-            return b.total - a.total || b.rate - a.rate;
-          } else {
-            return b.rate - a.rate || b.total - a.total;
-          }
-        });
+        .sort((a, b) => b.total - a.total || b.rate - a.rate);
       
       const heroItems = heroList.map(h => {
         const rateClass = h.rate >= 60 ? 'high' : (h.rate >= 40 ? 'mid' : 'low');
@@ -539,21 +452,165 @@
         ${heroItems}
       </div>`;
     }).join('');
+
+    // --- Render Matches History ---
+    const matchesByDate = {};
+    matches.forEach(m => {
+      // m.date is formatted as "2月1日 第1場", extract "2月1日"
+      const date = m.date.split(' ')[0];
+      if (!matchesByDate[date]) matchesByDate[date] = [];
+      matchesByDate[date].push(m);
+    });
+
+    document.getElementById('matches-list').innerHTML = Object.entries(matchesByDate).map(([date, dateMatches]) => {
+      let inner = `<div class="date-group"><div class="date-header">${date}</div>`;
+      
+      dateMatches.forEach(m => {
+        const matchNum = m.date.split(' ')[1] || m.date; // Fallback
+        const odaClass = m.winner === "oda" ? "winner" : "loser";
+        const unitedClass = m.winner === "united" ? "winner" : "loser";
+        const formatPlayers = (list) => list.map(p => `<div class="match-player"><strong>${p.name}</strong><span>${p.hero}</span></div>`).join('');
+        
+        inner += `<div class="match-card">
+          <div class="match-header">
+            <span class="match-number">${matchNum}</span>
+            <span class="match-bet">賭注 $${m.bet}</span>
+          </div>
+          <div class="match-teams">
+            <div class="team oda ${odaClass}"><div class="team-header">織田軍</div>${formatPlayers(m.oda)}</div>
+            <div class="team united ${unitedClass}"><div class="team-header">聯合軍</div>${formatPlayers(m.united)}</div>
+          </div>
+        </div>`;
+      });
+      return inner + `</div>`;
+    }).join('');
+
+    document.getElementById('last-update').innerText = new Date().toLocaleString('zh-HK');
   }
 
-  function switchTab(tab) {
+  // ==========================================
+  // 3. UI FUNCTIONS
+  // ==========================================
+
+  function switchTab(tabId) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    if (tab === 'players') {
-      document.querySelector('.tab:nth-child(1)').classList.add('active');
-      document.getElementById('players-tab').classList.add('active');
-    } else {
-      document.querySelector('.tab:nth-child(2)').classList.add('active');
-      document.getElementById('matches-tab').classList.add('active');
-    }
+    
+    // Map tabId to index for button highlighting
+    const index = tabId === 'players' ? 0 : (tabId === 'matches' ? 1 : 2);
+    document.querySelectorAll('.tab')[index].classList.add('active');
+    document.getElementById(`${tabId}-tab`).classList.add('active');
   }
 
-  renderSite();
+  // --- Tools: Player Selection ---
+  function initPlayerSelection() {
+    const container = document.getElementById('player-selection');
+    const sortedPlayers = Array.from(allPlayers).sort();
+    
+    container.innerHTML = sortedPlayers.map(player => `
+      <div class="player-checkbox" onclick="togglePlayer(this)">
+        <input type="checkbox" id="player-${player}" value="${player}">
+        <label for="player-${player}">${player}</label>
+      </div>
+    `).join('');
+  }
+
+  function togglePlayer(element) {
+    const checkbox = element.querySelector('input');
+    // Prevent double toggling if clicking directly on checkbox
+    if(event.target !== checkbox) {
+        checkbox.checked = !checkbox.checked;
+    }
+    if(checkbox.checked) element.classList.add('selected');
+    else element.classList.remove('selected');
+  }
+
+  // --- Tools: Random Team Generator ---
+  function randomTeams() {
+    const selected = Array.from(document.querySelectorAll('#player-selection input:checked')).map(cb => cb.value);
+    
+    if (selected.length !== 6) {
+      alert('⚠️ 請務必選擇剛好 6 位玩家！');
+      return;
+    }
+
+    // Shuffle
+    const shuffled = [...selected];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    const teamOda = shuffled.slice(0, 3);
+    const teamUnited = shuffled.slice(3, 6);
+    displayTeams(teamOda, teamUnited);
+  }
+
+  function displayTeams(teamOda, teamUnited) {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('zh-HK', { month: 'numeric', day: 'numeric' });
+    const timeStr = now.toLocaleTimeString('zh-HK', { hour: '2-digit', minute: '2-digit' });
+
+    // Show result container
+    document.getElementById('team-result-container').style.display = 'block';
+
+    // Inject content into the Capture Area
+    const captureArea = document.getElementById('capture-area');
+    captureArea.innerHTML = `
+        <div class="team-display-header">⚔️ 對戰分組結果 ⚔️</div>
+        <div class="team-display-date">📅 ${dateStr} ${timeStr}</div>
+        <div class="teams-grid">
+          <div class="team-box oda">
+            <div class="team-box-title">🔴 織田軍</div>
+            ${teamOda.map(p => `<div class="team-box-player">${p}</div>`).join('')}
+          </div>
+          <div class="team-box united">
+            <div class="team-box-title">🔵 聯合軍</div>
+            ${teamUnited.map(p => `<div class="team-box-player">${p}</div>`).join('')}
+          </div>
+        </div>
+    `;
+    
+    // Scroll to result
+    setTimeout(() => {
+        captureArea.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  }
+
+  // --- Tools: Capture Image ---
+  function captureImage() {
+    const element = document.getElementById('capture-area');
+    const btn = event.target;
+    const originalText = btn.innerText;
+    
+    btn.innerText = "⏳ 處理中...";
+    btn.disabled = true;
+
+    html2canvas(element, {
+      backgroundColor: '#111827', // Match card background
+      scale: 3, // High resolution
+      logging: false,
+      useCORS: true
+    }).then(canvas => {
+      // Create download link
+      const link = document.createElement('a');
+      link.download = `信長分隊_${new Date().getTime()}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      
+      btn.innerText = originalText;
+      btn.disabled = false;
+    }).catch(err => {
+      console.error(err);
+      alert("截圖失敗，請重試");
+      btn.innerText = originalText;
+      btn.disabled = false;
+    });
+  }
+
+  // --- Initialize ---
+  // Start loading data when page is ready
+  document.addEventListener('DOMContentLoaded', loadData);
 </script>
 
 </body>
