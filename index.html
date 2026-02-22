@@ -42,26 +42,21 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);min-hei
 .card{background:var(--card);backdrop-filter:blur(14px);border:1px solid var(--bdr);border-radius:13px;padding:16px 18px;margin-bottom:18px}
 
 /* VS BAR */
-.vs-wrap{position:relative;transition:transform .05s ease}
-.vs-track{
-  position:relative;height:100px;border-radius:10px;overflow:hidden;cursor:pointer;
-  border:1px solid rgba(212,175,55,.3);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 4px 20px rgba(0,0,0,.5);
-  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,.008) 3px,rgba(255,255,255,.008) 4px),#0d0e11;
-}
+.vs-wrap{position:relative;transition:transform .05s ease;margin-bottom:18px}
+.vs-track{position:relative;height:120px;border-radius:12px;overflow:hidden;cursor:pointer;border:1px solid rgba(212,175,55,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 4px 20px rgba(0,0,0,.5);background:#0d0e11}
 .vs-left{position:absolute;top:0;left:0;bottom:0;background:linear-gradient(90deg,#3d0000,#7a0000 50%,#c0392b 85%,#e74c3c);transition:width .9s cubic-bezier(.4,0,.2,1)}
 .vs-right{position:absolute;top:0;right:0;bottom:0;background:linear-gradient(270deg,#00103d,#002580 50%,#1a5fa0 85%,#2980b9);transition:width .9s cubic-bezier(.4,0,.2,1)}
 .vs-left::after,.vs-right::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 5px,rgba(255,255,255,.02) 5px,rgba(255,255,255,.02) 6px)}
 .vs-gold-line{position:absolute;bottom:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,transparent,#d4af37,transparent);opacity:.5;z-index:2;pointer-events:none}
 .vs-pc,.vs-lc{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
 .vs-pc{z-index:5}.vs-lc{z-index:15}
-.vs-info{position:absolute;inset:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:0 24px;pointer-events:none}
+.vs-info{position:absolute;inset:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:0 28px;pointer-events:none}
 .vs-side{display:flex;flex-direction:column;gap:2px}
 .vs-side.right{align-items:flex-end}
-.vs-cname{font-size:11px;font-weight:800;letter-spacing:2px;color:rgba(255,255,255,.45);text-transform:uppercase}
-.vs-pct{font-size:38px;font-weight:900;color:#d4af37;text-shadow:2px 2px 8px rgba(0,0,0,.8),0 0 18px rgba(212,175,55,.25);line-height:1;font-style:italic}
+.vs-cname{font-size:11px;font-weight:800;letter-spacing:2px;color:rgba(255,255,255,.45)}
+.vs-pct{font-size:42px;font-weight:900;color:#d4af37;text-shadow:2px 2px 8px rgba(0,0,0,.8),0 0 18px rgba(212,175,55,.25);line-height:1;font-style:italic;font-variant-numeric:tabular-nums}
 .vs-side.hovered .vs-pct{animation:rateShake .3s ease infinite}
-.vs-sub-line{margin-top:8px;text-align:center;font-size:10px;color:rgba(255,255,255,.25);letter-spacing:.5px}
+.vs-sub-line{margin-top:7px;text-align:center;font-size:10px;color:rgba(255,255,255,.25);letter-spacing:.5px}
 
 /* PLAYER TABLE */
 .ptable-wrap{background:var(--card);border:1px solid var(--bdr);border-radius:13px;backdrop-filter:blur(14px);overflow:hidden;margin-bottom:8px}
@@ -82,10 +77,11 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);min-hei
 .hrow{display:grid;grid-template-columns:1fr auto 50px;gap:8px;align-items:center;padding:6px 10px;border-radius:6px;transition:background .12s;margin-bottom:2px}
 .hrow:hover{background:rgba(255,255,255,.03)}
 
-/* TEAM CARDS */
-.team-card{background:var(--card);border:1px solid var(--bdr);border-radius:11px;padding:12px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:7px;transition:background .15s}
-.team-card:hover{background:rgba(20,28,50,.97)}
-.tag{font-size:11px;font-weight:700;padding:2px 8px;background:rgba(148,163,184,.05);border:1px solid rgba(148,163,184,.1);border-radius:20px;color:#94a3b8}
+/* TEAM CARDS — Grid Layout */
+.team-card{background:var(--card);border:1px solid var(--bdr);border-radius:11px;padding:0;overflow:hidden;margin-bottom:7px}
+.team-row{display:grid;grid-template-columns:1fr auto 90px;gap:8px;align-items:center;padding:11px 14px;transition:background .15s}
+.team-row:hover{background:rgba(148,163,184,.03)}
+.tag{font-size:11px;font-weight:700;padding:2px 9px;background:rgba(148,163,184,.05);border:1px solid rgba(148,163,184,.1);border-radius:20px;color:#94a3b8}
 .hero-chip{font-size:10px;padding:1px 5px;border-radius:5px;font-weight:600}
 .hero-chip-0{background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.15);color:#fbbf24}
 .hero-chip-1{background:rgba(148,163,184,.05);border:1px solid rgba(148,163,184,.1);color:#475569}
@@ -135,13 +131,15 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);min-hei
 footer{text-align:center;padding-top:36px;color:#0c1118;font-size:10px;letter-spacing:2px}
 
 @media(max-width:520px){
-  .vs-pct{font-size:26px!important}
-  .vs-track{height:82px}
+  .vs-pct{font-size:28px!important}
+  .vs-track{height:96px}
   .match-teams,.team-result-teams{grid-template-columns:1fr}
   .match-team-col:first-child{border-right:none;border-bottom:1px solid rgba(148,163,184,.04)}
   .tab-btn{padding:7px 12px;font-size:12px}
   .prow-wrap{grid-template-columns:24px 1fr 80px 60px!important}
   .prow-wrap>div:nth-child(4){display:none}
+  .team-row{grid-template-columns:1fr 90px!important}
+  .team-row>div:nth-child(2){display:none}
 }
 </style>
 </head>
@@ -180,7 +178,7 @@ footer{text-align:center;padding-top:36px;color:#0c1118;font-size:10px;letter-sp
 
 <script>
 /* ================================================================
-   VS BAR ENGINE v3
+   VS BAR ENGINE v4 — boundary sparks + stronger particles
 ================================================================ */
 let _vsOda=50,_vsAF=null,_vsLC=null,_vsPC=null;
 let _vsW=0,_vsH=0,_vsDPR=1,_vsHov=null;
@@ -228,10 +226,9 @@ function vsBarInit(pct){
 
 function _vsGenBolt(cx,str){
   const pts=[{x:cx,y:0}];let y=0;
-  const jit=13*str;
   while(y<_vsH){
     y+=3+Math.random()*7;
-    pts.push({x:cx+(Math.random()-.5)*jit*2,y:Math.min(y,_vsH)});
+    pts.push({x:cx+(Math.random()-.5)*13*str*2,y:Math.min(y,_vsH)});
   }
   return pts;
 }
@@ -248,20 +245,25 @@ function _vsDrawBolt(pts,alpha,gc,lw){
   });
   c.save();c.beginPath();c.moveTo(pts[0].x,pts[0].y);
   pts.slice(1).forEach(pt=>c.lineTo(pt.x,pt.y));
-  c.strokeStyle=`rgba(255,255,255,${alpha})`;c.globalAlpha=alpha;
+  c.strokeStyle='rgba(255,255,255,'+alpha+')';c.globalAlpha=alpha;
   c.lineWidth=lw;c.shadowBlur=6;c.shadowColor='#fff';
   c.lineCap=c.lineJoin='round';c.stroke();c.restore();
 }
 
 function _vsSpawn(cx){
-  const n=_vsHov?5:2;
+  const n=_vsHov?12:6;
   for(let i=0;i<n;i++){
-    if(_vsPts.length>=80)break;
+    if(_vsPts.length>=160)break;
+    const spawnY=_vsH*(0.05+Math.random()*0.9);
+    const dir=(Math.random()<0.5?-1:1)*(1.2+Math.random()*2);
     _vsPts.push({
-      x:cx+(Math.random()-.5)*18,y:Math.random()*_vsH,
-      sz:Math.random()*2+.5,vx:(Math.random()-.5)*2.5,
-      vy:-(Math.random()*2.5+1),op:.9+Math.random()*.1,
-      h:Math.random()<.5?'w':Math.random()<.5?'b':'o'
+      x:cx+(Math.random()-0.5)*6,
+      y:spawnY,
+      sz:Math.random()*2.8+0.5,
+      vx:dir,
+      vy:-(Math.random()*3+0.3),
+      op:0.9+Math.random()*0.1,
+      h:Math.random()<0.35?'w':Math.random()<0.5?'b':'o'
     });
   }
 }
@@ -270,11 +272,11 @@ function _vsDrawParts(){
   const c=_vsPC;c.clearRect(0,0,_vsW,_vsH);
   for(let i=_vsPts.length-1;i>=0;i--){
     const p=_vsPts[i];
-    p.x+=p.vx;p.y+=p.vy;p.op-=.018;p.vy*=.98;
-    if(p.op<=0||p.y<-5){_vsPts.splice(i,1);continue;}
-    const col=p.h==='w'?`rgba(255,255,255,${p.op})`:
-               p.h==='b'?`rgba(100,160,255,${p.op})`:`rgba(255,130,40,${p.op})`;
-    c.save();c.fillStyle=col;c.shadowBlur=5;c.shadowColor=col;
+    p.x+=p.vx;p.y+=p.vy;p.op-=0.013;p.vy*=0.97;p.vx*=0.98;
+    if(p.op<=0||p.y<-8||p.x<-8||p.x>_vsW+8){_vsPts.splice(i,1);continue;}
+    const col=p.h==='w'?'rgba(255,255,255,'+p.op+')':
+               p.h==='b'?'rgba(120,180,255,'+p.op+')':'rgba(255,140,30,'+p.op+')';
+    c.save();c.fillStyle=col;c.shadowBlur=9;c.shadowColor=col;
     c.beginPath();c.arc(p.x,p.y,p.sz,0,Math.PI*2);c.fill();c.restore();
   }
 }
@@ -283,32 +285,32 @@ function _vsLoop(ts){
   _vsLC.clearRect(0,0,_vsW,_vsH);
   const cx=(_vsOda/100)*_vsW;
   let str=_vsHov?1.9:1.0;
-  if(ts-_vsLB>2200+Math.random()*600&&Math.random()<.03){
+  if(ts-_vsLB>2200+Math.random()*600&&Math.random()<0.03){
     _vsLB=ts;_vsFT=8;_vsShT=10;
-    _vsSX=(Math.random()-.5)*10*str;_vsSY=(Math.random()-.5)*4*str;
+    _vsSX=(Math.random()-0.5)*10*str;_vsSY=(Math.random()-0.5)*4*str;
   }
   if(_vsFT>0){_vsFT--;str*=2.0;}
   const n=_vsHov?5:2+Math.floor(Math.random()*2);
   for(let i=0;i<n;i++){
-    const jit=(Math.random()-.5)*6,al=.4+Math.random()*.6;
+    const jit=(Math.random()-0.5)*6,al=0.4+Math.random()*0.6;
     const gc=['#6688ff','#aa66ff','#88ccff','#ffffff'][Math.floor(Math.random()*4)];
     _vsDrawBolt(_vsGenBolt(cx+jit,str),al,gc,1+Math.random());
   }
   if(Math.floor(ts/16)%3===0){
-    const bx=cx+(Math.random()-.5)*8,by=_vsH*(.15+Math.random()*.6);
+    const bx=cx+(Math.random()-0.5)*8,by=_vsH*(0.15+Math.random()*0.6);
     const bp=[{x:bx,y:by}];let bby=by;
-    while(bby<by+_vsH*.3){bby+=3+Math.random()*6;bp.push({x:bx+(Math.random()-.5)*22,y:bby});}
-    _vsDrawBolt(bp,.15+Math.random()*.2,'#aabbff',.5);
+    while(bby<by+_vsH*0.3){bby+=3+Math.random()*6;bp.push({x:bx+(Math.random()-0.5)*22,y:bby});}
+    _vsDrawBolt(bp,0.15+Math.random()*0.2,'#aabbff',0.5);
   }
   if(_vsFT>5){
     _vsLC.save();
-    _vsLC.fillStyle=`rgba(255,255,255,${(_vsFT-5)/4*.22})`;
+    _vsLC.fillStyle='rgba(255,255,255,'+(_vsFT-5)/4*0.22+')';
     _vsLC.fillRect(0,0,_vsW,_vsH);_vsLC.restore();
   }
   _vsSpawn(cx);_vsDrawParts();
   const wrap=document.getElementById('vs-wrap');
   if(wrap){
-    if(_vsShT>0){_vsShT--;const d=_vsShT/10;wrap.style.transform=`translate(${_vsSX*d}px,${_vsSY*d}px)`;}
+    if(_vsShT>0){_vsShT--;const d=_vsShT/10;wrap.style.transform='translate('+(_vsSX*d)+'px,'+(_vsSY*d)+'px)';}
     else wrap.style.transform='none';
   }
   _vsAF=requestAnimationFrame(_vsLoop);
@@ -318,7 +320,7 @@ function _vsLoop(ts){
    DATA ENGINE
 ================================================================ */
 const SHEET_ID='1dTL4GswalL2faUeKUfe0NhNuj39RmodSa7zBNjVTM-U';
-const CSV_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Sheet1`;
+const CSV_URL='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&sheet=Sheet1';
 
 const dateNum=d=>{const m=d.match(/(\d+)月(\d+)日/);return m?+m[1]*100+ +m[2]:0;};
 const matchNum=s=>{const m=s.match(/第(\d+)場/);return m?+m[1]:0;};
@@ -348,7 +350,7 @@ function parseCSV(text){
 function buildMatches(rows){
   const map={};
   rows.forEach(r=>{
-    const key=`${r.date}_${r.match}`;
+    const key=r.date+'_'+r.match;
     if(!map[key])map[key]={date:r.date,match:r.match,bet:r.bet,oda:[],united:[],winner:null};
     const side=r.side==='oda'?map[key].oda:map[key].united;
     if(!side.find(p=>p.player===r.player))side.push({player:r.player,hero:r.hero});
@@ -429,7 +431,7 @@ function calcBestTeammate(playerName,matches){
 
 function sparklineHTML(spark){
   const r=5,w=68,sp=(w-r*2*spark.length)/(spark.length-1);
-  return`<svg width="${w}" height="${r*2}" style="overflow:visible;display:block">${spark.map((v,i)=>`<circle cx="${r+(r*2+sp)*i+r}" cy="${r}" r="${v===null?2:r}" fill="${v===null?'rgba(255,255,255,.07)':v?'#4ade80':'#f87171'}"/>`).join('')}</svg>`;
+  return '<svg width="'+w+'" height="'+(r*2)+'" style="overflow:visible;display:block">'+spark.map((v,i)=>'<circle cx="'+(r+(r*2+sp)*i+r)+'" cy="'+r+'" r="'+(v===null?2:r)+'" fill="'+(v===null?'rgba(255,255,255,.07)':v?'#4ade80':'#f87171')+'"/>').join('')+'</svg>';
 }
 
 function computeBadges(players,matches){
@@ -439,8 +441,8 @@ function computeBadges(players,matches){
   const topBT=Object.entries(btCount).sort((a,b)=>b[1]-a[1])[0]?.[0]||null;
   return players.map(p=>{
     const badges=[];
-    if(p.streakWin&&p.streak>=3)badges.push({cls:'badge-win',txt:`🔥${p.streak}連勝`});
-    if(!p.streakWin&&p.streak>=3)badges.push({cls:'badge-lose',txt:`❄️${p.streak}連敗`});
+    if(p.streakWin&&p.streak>=3)badges.push({cls:'badge-win',txt:'🔥'+p.streak+'連勝'});
+    if(!p.streakWin&&p.streak>=3)badges.push({cls:'badge-lose',txt:'❄️'+p.streak+'連敗'});
     if(p.heroStats.length===maxPool&&maxPool>3)badges.push({cls:'badge-blue',txt:'🎯英雄王'});
     if(p.name===topBT)badges.push({cls:'badge-teal',txt:'🤝最佳隊員'});
     return{...p,badges};
@@ -452,7 +454,7 @@ let allPlayers=[],allMatches=[],allTeams=[],allPNames=[];
 
 function renderPlayers(){
   if(!allPlayers.length){
-    document.getElementById('pane-players').innerHTML=`<div style="text-align:center;padding:60px 20px;color:#475569"><div style="font-size:36px;margin-bottom:14px;opacity:.4">📊</div><div style="font-size:14px;font-weight:600;margin-bottom:6px">暫無玩家數據</div></div>`;
+    document.getElementById('pane-players').innerHTML='<div style="text-align:center;padding:60px 20px;color:#475569"><div style="font-size:36px;margin-bottom:14px;opacity:.4">📊</div><div style="font-size:14px;font-weight:600;margin-bottom:6px">暫無玩家數據</div></div>';
     return;
   }
   const withBadges=computeBadges(allPlayers,allMatches);
@@ -461,30 +463,23 @@ function renderPlayers(){
   const totM=allMatches.length;
   const odaPct=totM?Math.round(odaW/totM*100):50,uniPct=100-odaPct;
 
-  let html=`
-  <div class="sec-bar"><span>⚔️ 陣營勝率</span></div>
-  <div class="vs-wrap fade-up" id="vs-wrap">
-    <div class="vs-track" id="vs-track">
-      <div class="vs-left"  id="vs-lb" style="width:0"></div>
-      <div class="vs-right" id="vs-rb" style="width:0"></div>
-      <canvas class="vs-pc" id="vs-pc"></canvas>
-      <canvas class="vs-lc" id="vs-lc"></canvas>
-      <div class="vs-info">
-        <div class="vs-side left" id="vs-fl">
-          <span class="vs-cname">織田軍</span>
-          <span class="vs-pct" id="vs-rl">${odaPct}%</span>
-        </div>
-        <div class="vs-side right" id="vs-fr">
-          <span class="vs-cname">聯合軍</span>
-          <span class="vs-pct" id="vs-rr">${uniPct}%</span>
-        </div>
-      </div>
-      <div class="vs-gold-line"></div>
-    </div>
-    <div class="vs-sub-line">共 ${totM} 場 &nbsp;·&nbsp; 織田軍 ${odaW}W &nbsp;·&nbsp; 聯合軍 ${totM-odaW}W</div>
-  </div>
-  <div class="sec-bar"><span>🏆 玩家總覽</span></div>
-  <div class="ptable-wrap fade-up">`;
+  let html='<div class="sec-bar"><span>⚔️ 陣營勝率</span></div>'
+    +'<div class="vs-wrap fade-up" id="vs-wrap">'
+    +'<div class="vs-track" id="vs-track">'
+    +'<div class="vs-left" id="vs-lb" style="width:0"></div>'
+    +'<div class="vs-right" id="vs-rb" style="width:0"></div>'
+    +'<canvas class="vs-pc" id="vs-pc"></canvas>'
+    +'<canvas class="vs-lc" id="vs-lc"></canvas>'
+    +'<div class="vs-info">'
+    +'<div class="vs-side left" id="vs-fl"><span class="vs-cname">織田軍</span><span class="vs-pct" id="vs-rl">'+odaPct+'%</span></div>'
+    +'<div class="vs-side right" id="vs-fr"><span class="vs-cname">聯合軍</span><span class="vs-pct" id="vs-rr">'+uniPct+'%</span></div>'
+    +'</div>'
+    +'<div class="vs-gold-line"></div>'
+    +'</div>'
+    +'<div class="vs-sub-line">共 '+totM+' 場 &nbsp;·&nbsp; 織田軍 '+odaW+'W &nbsp;·&nbsp; 聯合軍 '+(totM-odaW)+'W</div>'
+    +'</div>'
+    +'<div class="sec-bar"><span>🏆 玩家總覽</span></div>'
+    +'<div class="ptable-wrap fade-up">';
 
   sorted.forEach((p,i)=>{
     const col=rateCol(p.rate);
@@ -492,71 +487,49 @@ function renderPlayers(){
     const rankCol=i===0?'#fbbf24':i===1?'#94a3b8':i===2?'#78350f':'#334155';
     const isOpen=openedPlayer===p.name;
     const moneyRaw=Math.round(p.money*10)/10;
-    const moneyStr=`${moneyRaw>=0?'+':''}\$${moneyRaw}`;
+    const moneyStr=(moneyRaw>=0?'+':'')+'\$'+moneyRaw;
     const moneyColor=moneyRaw>=0?'#4ade80':'#f87171';
     const rowCls=p.streakWin?'last-win':'last-lose';
-    const badgeHTML=p.badges.map(b=>`<span class="badge ${b.cls}">${b.txt}</span>`).join('');
-
-    html+=`<div>
-      <div class="prow-wrap ${rowCls}${isOpen?' open':''}" onclick="togglePlayer('${p.name}')">
-        <div class="fs14 fw7 ta-c" style="font-size:${i<3?15:12}px;color:${rankCol}">${rankIcon}</div>
-        <div>
-          <div class="row-wrap" style="line-height:1.3">
-            <span class="fs14 fw7" style="color:#e2e8f0">${p.name}</span>
-            <span style="margin-left:5px">${badgeHTML}</span>
-          </div>
-          <div class="row fs12" style="gap:5px;align-items:baseline;margin-top:3px">
-            <span class="fw7 green">${p.wins}W</span>
-            <span class="muted">/</span>
-            <span class="fw7 red">${p.losses}L</span>
-            <span class="muted fs11">${p.total}場</span>
-          </div>
-        </div>
-        <div class="col ta-c" style="gap:4px">
-          <div class="rate-num" style="color:${col}">${p.rate}%</div>
-          ${sparklineHTML(p.spark)}
-        </div>
-        <div class="ta-c">
-          <div class="fs16 fw8" style="color:#64748b">${p.heroStats.length}</div>
-        </div>
-        <div class="ta-r">
-          <div class="fs14 fw7" style="color:${moneyColor}">${moneyStr}</div>
-        </div>
-      </div>
-      <div class="hero-expand-row" id="expand-${p.name}" style="max-height:${isOpen?'2000px':'0'};transition:max-height .3s ease">
-        ${isOpen?heroExpandHTML(p):''}
-      </div>
-    </div>`;
+    const badgeHTML=p.badges.map(b=>'<span class="badge '+b.cls+'">'+b.txt+'</span>').join('');
+    html+='<div>'
+      +'<div class="prow-wrap '+rowCls+(isOpen?' open':'')+'" onclick="togglePlayer(\''+p.name+'\')">'
+      +'<div class="fs14 fw7 ta-c" style="font-size:'+(i<3?15:12)+'px;color:'+rankCol+'">'+rankIcon+'</div>'
+      +'<div>'
+      +'<div class="row-wrap" style="line-height:1.3"><span class="fs14 fw7" style="color:#e2e8f0">'+p.name+'</span><span style="margin-left:5px">'+badgeHTML+'</span></div>'
+      +'<div class="row fs12" style="gap:5px;align-items:baseline;margin-top:3px"><span class="fw7 green">'+p.wins+'W</span><span class="muted">/</span><span class="fw7 red">'+p.losses+'L</span><span class="muted fs11">'+p.total+'場</span></div>'
+      +'</div>'
+      +'<div class="col ta-c" style="gap:4px"><div class="rate-num" style="color:'+col+'">'+p.rate+'%</div>'+sparklineHTML(p.spark)+'</div>'
+      +'<div class="ta-c"><div class="fs16 fw8" style="color:#64748b">'+p.heroStats.length+'</div></div>'
+      +'<div class="ta-r"><div class="fs14 fw7" style="color:'+moneyColor+'">'+moneyStr+'</div></div>'
+      +'</div>'
+      +'<div class="hero-expand-row" id="expand-'+p.name+'" style="max-height:'+(isOpen?'2000px':'0')+';transition:max-height .3s ease">'
+      +(isOpen?heroExpandHTML(p):'')
+      +'</div>'
+      +'</div>';
   });
 
-  html+=`</div>
-  <div style="text-align:center;font-size:10px;color:#0f172a;margin-bottom:22px">↑ 點擊行展開英雄池詳情 ↑</div>
-  <div class="sec-bar"><span>🤝 組隊勝率</span></div>`;
+  html+='</div><div style="text-align:center;font-size:10px;color:#0f172a;margin-bottom:22px">↑ 點擊行展開英雄池詳情 ↑</div>'
+    +'<div class="sec-bar"><span>🤝 組隊勝率</span></div>';
 
   allTeams.forEach((t,ti)=>{
-    const heroChips=t.topHeroes.map((h,idx)=>`<span class="hero-chip hero-chip-${idx}">${['🥇','🥈','🥉'][idx]} ${h}</span>`).join('');
-    const sizeTag=`<span style="font-size:9px;color:#334155;border:1px solid #1e293b;padding:0 4px;border-radius:3px;margin-left:2px">${t.members.length}人</span>`;
-    html+=`<div class="team-card fade-up" style="animation-delay:${ti*.04}s">
-      <div class="team-row">
-        <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
-          ${t.members.map(m=>`<span style="font-size:13px;font-weight:800;color:#e2e8f0;padding:2px 9px;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.12);border-radius:20px">${m}</span>`).join('')}${sizeTag}
-        </div>
-        <div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end;align-items:center">
-          ${heroChips}
-        </div>
-        <div style="text-align:center">
-          <div class="rate-num" style="color:${rateCol(t.rate)}">${t.rate}%</div>
-          <div style="font-size:10px;color:#475569;margin-top:2px;font-variant-numeric:tabular-nums">${t.wins}W·${t.losses}L</div>
-        </div>
-      </div>
-    </div>`;
+    const heroChips=t.topHeroes.map((h,idx)=>'<span class="hero-chip hero-chip-'+idx+'">'+['🥇','🥈','🥉'][idx]+' '+h+'</span>').join('');
+    const sizeTag='<span style="font-size:9px;color:#334155;border:1px solid #1e293b;padding:0 4px;border-radius:3px;margin-left:3px">'+t.members.length+'人</span>';
+    html+='<div class="team-card fade-up" style="animation-delay:'+(ti*0.04)+'s">'
+      +'<div class="team-row">'
+      +'<div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">'
+      +t.members.map(m=>'<span style="font-size:13px;font-weight:800;color:#e2e8f0;padding:2px 9px;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.12);border-radius:20px">'+m+'</span>').join('')+sizeTag
+      +'</div>'
+      +'<div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end;align-items:center;padding:0 6px">'+heroChips+'</div>'
+      +'<div style="text-align:center;min-width:80px">'
+      +'<div class="rate-num" style="color:'+rateCol(t.rate)+'">'+t.rate+'%</div>'
+      +'<div style="font-size:10px;color:#475569;margin-top:2px;font-variant-numeric:tabular-nums">'+t.wins+'W·'+t.losses+'L</div>'
+      +'</div>'
+      +'</div>'
+      +'</div>';
   });
 
   document.getElementById('pane-players').innerHTML=html;
-  setTimeout(()=>{
-    const p2=totM?Math.round(odaW/totM*100):50;
-    vsBarInit(p2);
-  },120);
+  setTimeout(()=>vsBarInit(totM?Math.round(odaW/totM*100):50),120);
 }
 
 function heroExpandHTML(p){
@@ -564,21 +537,15 @@ function heroExpandHTML(p){
     if(hSort==='rate'){const ra=a.total?a.wins/a.total:0,rb=b.total?b.wins/b.total:0;return rb-ra||b.total-a.total;}
     return b.total-a.total;
   });
-  const sortBtns=['count','rate'].map(k=>`<button onclick="setHSort('${k}',event)" style="padding:2px 8px;background:${hSort===k?'#475569':'rgba(5,8,15,.8)'};color:${hSort===k?'#f1f5f9':'#334155'};border:1px solid ${hSort===k?'#64748b':'rgba(148,163,184,.08)'};border-radius:4px;cursor:pointer;font-size:10px;font-weight:700;font-family:inherit">${k==='count'?'次數':'勝率'}</button>`).join('');
-  return`<div style="padding:10px 14px 12px">
-    <div class="row-sb" style="margin-bottom:8px;flex-wrap:wrap;gap:5px">
-      <span class="fs10 muted" style="text-transform:uppercase;letter-spacing:.8px;font-weight:700">英雄池 (${p.heroStats.length})</span>
-      <div style="display:flex;gap:3px">${sortBtns}</div>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:3px">
-      ${s.map(h=>{const hr=h.total?Math.round(h.wins/h.total*100):0;return`
-        <div class="hrow">
-          <span class="fs12 fw6" style="color:#cbd5e1">${h.name}</span>
-          <span class="fs10 muted">${h.total}場 · ${h.wins}W${h.losses?` / ${h.losses}L`:''}</span>
-          <span class="fs13 fw7 ta-r" style="color:${rateCol(hr)}">${hr}%</span>
-        </div>`}).join('')}
-    </div>
-  </div>`;
+  const sortBtns=['count','rate'].map(k=>'<button onclick="setHSort(\''+k+'\',event)" style="padding:2px 8px;background:'+(hSort===k?'#475569':'rgba(5,8,15,.8)')+';color:'+(hSort===k?'#f1f5f9':'#334155')+';border:1px solid '+(hSort===k?'#64748b':'rgba(148,163,184,.08)')+';border-radius:4px;cursor:pointer;font-size:10px;font-weight:700;font-family:inherit">'+(k==='count'?'次數':'勝率')+'</button>').join('');
+  return '<div style="padding:10px 14px 12px">'
+    +'<div class="row-sb" style="margin-bottom:8px;flex-wrap:wrap;gap:5px">'
+    +'<span class="fs10 muted" style="text-transform:uppercase;letter-spacing:.8px;font-weight:700">英雄池 ('+p.heroStats.length+')</span>'
+    +'<div style="display:flex;gap:3px">'+sortBtns+'</div>'
+    +'</div>'
+    +'<div style="display:flex;flex-direction:column;gap:3px">'
+    +s.map(h=>{const hr=h.total?Math.round(h.wins/h.total*100):0;return'<div class="hrow"><span class="fs12 fw6" style="color:#cbd5e1">'+h.name+'</span><span class="fs10 muted">'+h.total+'場 · '+h.wins+'W'+(h.losses?' / '+h.losses+'L':'')+'</span><span class="fs13 fw7 ta-r" style="color:'+rateCol(hr)+'">'+hr+'%</span></div>';}).join('')
+    +'</div></div>';
 }
 
 const openDates=new Set();
@@ -590,45 +557,42 @@ function renderMatches(){
   const newestDate=entries[0]?.[0];
   if(openDates.size===0&&newestDate)openDates.add(newestDate);
   if(!entries.length){
-    document.getElementById('pane-matches').innerHTML=`<div style="text-align:center;padding:60px 20px;color:#475569"><div style="font-size:36px;margin-bottom:14px;opacity:.4">📅</div><div>暫無對戰記錄</div></div>`;
+    document.getElementById('pane-matches').innerHTML='<div style="text-align:center;padding:60px 20px;color:#475569"><div style="font-size:36px;margin-bottom:14px;opacity:.4">📅</div><div>暫無對戰記錄</div></div>';
     return;
   }
-  let html=`<div class="sec-bar"><span>📅 對戰歷史</span></div><div class="timeline-wrap"><div class="timeline-line"></div>`;
+  let html='<div class="sec-bar"><span>📅 對戰歷史</span></div><div class="timeline-wrap"><div class="timeline-line"></div>';
   entries.forEach(([date,ms],di)=>{
     const dOdaW=ms.filter(m=>m.winner==='oda').length;
     const isNewest=date===newestDate,isOpen=openDates.has(date);
     const bets=[...new Set(ms.map(m=>m.bet))];
-    const betStr=bets.length===1?`\$${bets[0]}`:`\$${Math.min(...bets)}~\$${Math.max(...bets)}`;
-    const matchesHTML=ms.map(m=>`<div class="match-compact">
-      <div class="match-compact-head">
-        <span style="font-size:12px;font-weight:700;color:#94a3b8">${m.match}</span>
-        <span style="font-size:11px;font-weight:700;color:#fbbf24">\$${m.bet}</span>
-      </div>
-      <div class="match-teams">
-        ${[{team:m.oda,side:'oda',label:'織田軍'},{team:m.united,side:'united',label:'聯合軍'}].map(({team,side,label})=>{
+    const betStr=bets.length===1?'\$'+bets[0]:'\$'+Math.min(...bets)+'~\$'+Math.max(...bets);
+    const matchesHTML=ms.map(m=>{
+      return '<div class="match-compact">'
+        +'<div class="match-compact-head">'
+        +'<span style="font-size:12px;font-weight:700;color:#94a3b8">'+m.match+'</span>'
+        +'<span style="font-size:11px;font-weight:700;color:#fbbf24">\$'+m.bet+'</span>'
+        +'</div>'
+        +'<div class="match-teams">'
+        +[{team:m.oda,side:'oda',label:'織田軍'},{team:m.united,side:'united',label:'聯合軍'}].map(({team,side,label})=>{
           const won=m.winner===side,nc=won?'#4ade80':'#f87171';
-          return`<div class="match-team-col">
-            <div class="match-team-name" style="color:${nc}">${label}<span style="font-size:10px;padding:1px 5px;border-radius:4px;margin-left:4px;background:${won?'rgba(74,222,128,.07)':'rgba(248,113,113,.07)'};color:${nc}">${won?'勝':'敗'}</span></div>
-            ${team.map(pl=>`<div class="match-player-line"><span style="color:${won?'#e2e8f0':'#64748b'};font-weight:600">${pl.player}</span><span style="color:${won?'#64748b':'#334155'}">${pl.hero}</span></div>`).join('')}
-          </div>`;
-        }).join('')}
-      </div>
-    </div>`).join('');
-    html+=`<div class="tl-date-node fade-up" style="animation-delay:${di*.05}s">
-      <div class="tl-dot${isNewest?' new':''}" ></div>
-      <div class="tl-date-label" onclick="toggleDate('${date}')">
-        <span class="tl-date-text">${date}</span>${isNewest?'<span class="new-badge">NEW</span>':''}<div class="tl-date-meta">
-          <span style="color:#475569">${ms.length}場</span>
-          <span style="font-weight:700;color:#fbbf24">${betStr}</span>
-          <span style="font-weight:600;color:#4ade80">織田${dOdaW}W</span>
-          <span style="font-weight:600;color:#f87171">聯合${ms.length-dOdaW}W</span>
-        </div>
-        <span class="tl-toggle">${isOpen?'▲':'▼'}</span>
-      </div>
-      <div class="tl-matches" style="max-height:${isOpen?'2000px':'0'}">${isOpen?matchesHTML:''}</div>
-    </div>`;
+          return '<div class="match-team-col">'
+            +'<div class="match-team-name" style="color:'+nc+'">'+label+'<span style="font-size:10px;padding:1px 5px;border-radius:4px;margin-left:4px;background:'+(won?'rgba(74,222,128,.07)':'rgba(248,113,113,.07)')+';color:'+nc+'">'+(won?'勝':'敗')+'</span></div>'
+            +team.map(pl=>'<div class="match-player-line"><span style="color:'+(won?'#e2e8f0':'#64748b')+';font-weight:600">'+pl.player+'</span><span style="color:'+(won?'#64748b':'#334155')+'">'+pl.hero+'</span></div>').join('')
+            +'</div>';
+        }).join('')
+        +'</div></div>';
+    }).join('');
+    html+='<div class="tl-date-node fade-up" style="animation-delay:'+(di*0.05)+'s">'
+      +'<div class="tl-dot'+(isNewest?' new':'')+'"></div>'
+      +'<div class="tl-date-label" onclick="toggleDate(\''+date+'\')">'
+      +'<span class="tl-date-text">'+date+'</span>'+(isNewest?'<span class="new-badge">NEW</span>':'')
+      +'<div class="tl-date-meta"><span style="color:#475569">'+ms.length+'場</span><span style="font-weight:700;color:#fbbf24">'+betStr+'</span><span style="font-weight:600;color:#4ade80">織田'+dOdaW+'W</span><span style="font-weight:600;color:#f87171">聯合'+(ms.length-dOdaW)+'W</span></div>'
+      +'<span class="tl-toggle">'+(isOpen?'▲':'▼')+'</span>'
+      +'</div>'
+      +'<div class="tl-matches" style="max-height:'+(isOpen?'2000px':'0')+'">'+(isOpen?matchesHTML:'')+'</div>'
+      +'</div>';
   });
-  html+=`</div>`;
+  html+='</div>';
   document.getElementById('pane-matches').innerHTML=html;
 }
 function toggleDate(date){openDates.has(date)?openDates.delete(date):openDates.add(date);renderMatches();}
@@ -657,61 +621,47 @@ function fallbackDownload(blob){
 
 function renderTools(){
   const canRand=pickedSet.size>=6&&pickedSet.size<=7;
-  const pickItems=allPNames.map(n=>`<div class="pick-item${pickedSet.has(n)?' sel':''}" onclick="togglePick('${n}')">${pickedSet.has(n)?'✓ ':''} ${n}</div>`).join('');
+  const pickItems=allPNames.map(n=>'<div class="pick-item'+(pickedSet.has(n)?' sel':'')+'" onclick="togglePick(\''+n+'\')">'+(pickedSet.has(n)?'✓ ':'')+n+'</div>').join('');
   const pRateMap={},pStatsMap={};
   allPlayers.forEach(p=>{pRateMap[p.name]=p.rate;pStatsMap[p.name]={wins:p.wins,total:p.total};});
   let teamHTML='';
   if(teamRes){
-    teamHTML=`<div id="export-target" class="team-result-card fade-up" style="margin-top:18px">
-      <div style="font-size:17px;font-weight:700;text-align:center;color:#e2e8f0;margin-bottom:14px">⚔️ 分隊結果</div>
-      <div class="team-result-teams">
-        ${[{team:teamRes.oda,label:'🔴 織田軍',col:'#ef4444'},{team:teamRes.united,label:'🔵 聯合軍',col:'#3b82f6'}].map(({team,label,col})=>{
-          const tW=team.reduce((s,n)=>s+(pStatsMap[n]?.wins||0),0);
-          const tG=team.reduce((s,n)=>s+(pStatsMap[n]?.total||0),0);
-          const avgRate=tG?Math.round(tW/tG*100):0;
-          return`<div class="result-team" style="border-top:2px solid ${col}">
-            <div class="row-sb" style="margin-bottom:9px">
-              <span style="font-size:12px;font-weight:800;color:${col}">${label}</span>
-              <span style="font-size:11px;font-weight:700;color:${rateCol(avgRate)}">隊均 ${avgRate}%</span>
-            </div>
-            ${team.map((n,i)=>`<div class="row-sb" style="padding:6px 0;border-bottom:${i<team.length-1?'1px solid rgba(255,255,255,.04)':'none'}">
-              <span style="font-size:14px;font-weight:600;color:#e2e8f0">${n}</span>
-              <span style="font-size:12px;font-weight:700;color:${rateCol(pRateMap[n]||0)}">${pRateMap[n]||0}%</span>
-            </div>`).join('')}
-          </div>`;
-        }).join('')}
-      </div>
-    </div>
-    <div class="row" style="justify-content:center;gap:10px;margin-top:12px">
-      <button onclick="doRandom()" style="padding:7px 22px;border-radius:7px;border:1px solid rgba(148,163,184,.1);background:rgba(5,8,15,.8);color:#475569;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">🎲 重新分隊</button>
-      <button onclick="exportTeamImage()" class="export-btn">📸 分享圖片</button>
-    </div>`;
+    teamHTML='<div id="export-target" class="team-result-card fade-up" style="margin-top:18px">'
+      +'<div style="font-size:17px;font-weight:700;text-align:center;color:#e2e8f0;margin-bottom:14px">⚔️ 分隊結果</div>'
+      +'<div class="team-result-teams">'
+      +[{team:teamRes.oda,label:'🔴 織田軍',col:'#ef4444'},{team:teamRes.united,label:'🔵 聯合軍',col:'#3b82f6'}].map(({team,label,col})=>{
+        const tW=team.reduce((s,n)=>s+(pStatsMap[n]?.wins||0),0);
+        const tG=team.reduce((s,n)=>s+(pStatsMap[n]?.total||0),0);
+        const avgRate=tG?Math.round(tW/tG*100):0;
+        return '<div class="result-team" style="border-top:2px solid '+col+'">'
+          +'<div class="row-sb" style="margin-bottom:9px"><span style="font-size:12px;font-weight:800;color:'+col+'">'+label+'</span><span style="font-size:11px;font-weight:700;color:'+rateCol(avgRate)+'">隊均 '+avgRate+'%</span></div>'
+          +team.map((n,i)=>'<div class="row-sb" style="padding:6px 0;border-bottom:'+(i<team.length-1?'1px solid rgba(255,255,255,.04)':'none')+'"><span style="font-size:14px;font-weight:600;color:#e2e8f0">'+n+'</span><span style="font-size:12px;font-weight:700;color:'+rateCol(pRateMap[n]||0)+'">'+( pRateMap[n]||0)+'%</span></div>').join('')
+          +'</div>';
+      }).join('')
+      +'</div></div>'
+      +'<div class="row" style="justify-content:center;gap:10px;margin-top:12px">'
+      +'<button onclick="doRandom()" style="padding:7px 22px;border-radius:7px;border:1px solid rgba(148,163,184,.1);background:rgba(5,8,15,.8);color:#475569;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">🎲 重新分隊</button>'
+      +'<button onclick="exportTeamImage()" class="export-btn">📸 分享圖片</button>'
+      +'</div>';
   }
-  document.getElementById('pane-tools').innerHTML=`
-    <div class="sec-bar"><span>🎲 隨機分隊工具</span></div>
-    <div class="card">
-      <div class="row" style="gap:8px;margin-bottom:12px">
-        <span style="font-size:14px;font-weight:600;color:#cbd5e1">選擇 6 或 7 位玩家</span>
-        <span style="font-size:12px;color:${canRand?'#4ade80':'#475569'}">已選 ${pickedSet.size} 人${canRand?' ✓':''}</span>
-      </div>
-      <div class="pick-grid">${pickItems}</div>
-      <div class="ta-c"><button onclick="doRandom()" class="rand-btn ${canRand?'on':'off'}">🎲 隨機分隊</button></div>
-    </div>${teamHTML}`;
+  document.getElementById('pane-tools').innerHTML='<div class="sec-bar"><span>🎲 隨機分隊工具</span></div>'
+    +'<div class="card">'
+    +'<div class="row" style="gap:8px;margin-bottom:12px"><span style="font-size:14px;font-weight:600;color:#cbd5e1">選擇 6 或 7 位玩家</span><span style="font-size:12px;color:'+(canRand?'#4ade80':'#475569')+'">已選 '+pickedSet.size+' 人'+(canRand?' ✓':'')+'</span></div>'
+    +'<div class="pick-grid">'+pickItems+'</div>'
+    +'<div class="ta-c"><button onclick="doRandom()" class="rand-btn '+(canRand?'on':'off')+'">🎲 隨機分隊</button></div>'
+    +'</div>'+teamHTML;
 }
 
 function setTab(id){
   document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['players','matches','tools'][i]===id));
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
-  document.getElementById(`pane-${id}`).classList.add('active');
+  document.getElementById('pane-'+id).classList.add('active');
 }
-function togglePlayer(name){
-  openedPlayer=openedPlayer===name?null:name;
-  renderPlayers();
-}
+function togglePlayer(name){openedPlayer=openedPlayer===name?null:name;renderPlayers();}
 function setHSort(k,e){
   e&&e.stopPropagation();hSort=k;
   if(openedPlayer){
-    const el=document.getElementById(`expand-${openedPlayer}`);
+    const el=document.getElementById('expand-'+openedPlayer);
     const p=allPlayers.find(x=>x.name===openedPlayer);
     if(el&&p)el.innerHTML=heroExpandHTML(p);
   }
@@ -741,7 +691,7 @@ function doRandom(){
   }catch(e){
     badge.style.cssText='padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);color:#f87171';
     badge.textContent='⚠ 無數據';
-    document.getElementById('pane-players').innerHTML=`<div style="text-align:center;padding:60px 20px;color:#334155"><div style="font-size:32px;margin-bottom:12px">📭</div><div style="font-size:15px;font-weight:600;margin-bottom:6px;color:#475569">未能載入數據</div></div>`;
+    document.getElementById('pane-players').innerHTML='<div style="text-align:center;padding:60px 20px;color:#334155"><div style="font-size:32px;margin-bottom:12px">📭</div><div style="font-size:15px;font-weight:600;margin-bottom:6px;color:#475569">未能載入數據</div></div>';
   }
   renderPlayers();renderMatches();renderTools();
 })();
