@@ -180,8 +180,7 @@ footer{text-align:center;padding-top:36px;color:#0c1118;font-size:10px;letter-sp
 
 <script>
 /* ================================================================
-   ⚡ VS BAR ENGINE v3
-   修改勝率: vsBarInit(odaPct) — 電擊線+Bar寬度全部自動同步
+   VS BAR ENGINE v3
 ================================================================ */
 let _vsOda=50,_vsAF=null,_vsLC=null,_vsPC=null;
 let _vsW=0,_vsH=0,_vsDPR=1,_vsHov=null;
@@ -295,7 +294,6 @@ function _vsLoop(ts){
     const gc=['#6688ff','#aa66ff','#88ccff','#ffffff'][Math.floor(Math.random()*4)];
     _vsDrawBolt(_vsGenBolt(cx+jit,str),al,gc,1+Math.random());
   }
-  // 分叉閃電 (每3幀)
   if(Math.floor(ts/16)%3===0){
     const bx=cx+(Math.random()-.5)*8,by=_vsH*(.15+Math.random()*.6);
     const bp=[{x:bx,y:by}];let bby=by;
@@ -339,7 +337,7 @@ function parseCSV(text){
       else cur+=ch;
     }
     cols.push(cur.trim());
-    const c=cols.map(x=>x.replace(/"/g,'').trim());
+    const c=cols.map(x=>x.replace(/"/g,'').replace(/[\u200B\u00A0\u3000\uFEFF]/g,'').trim());
     const[date,match,betStr,wl,sideRaw,player,hero]=c;
     if(!date||!wl||!player)return null;
     const side=sideRaw==='織田軍'||sideRaw.toLowerCase()==='oda'?'oda':'united';
@@ -352,7 +350,8 @@ function buildMatches(rows){
   rows.forEach(r=>{
     const key=`${r.date}_${r.match}`;
     if(!map[key])map[key]={date:r.date,match:r.match,bet:r.bet,oda:[],united:[],winner:null};
-    (r.side==='oda'?map[key].oda:map[key].united).push({player:r.player,hero:r.hero});
+    const side=r.side==='oda'?map[key].oda:map[key].united;
+    if(!side.find(p=>p.player===r.player))side.push({player:r.player,hero:r.hero});
     if(r.wl==='W')map[key].winner=r.side;
   });
   return Object.values(map).sort((a,b)=>{
@@ -464,27 +463,25 @@ function renderPlayers(){
 
   let html=`
   <div class="sec-bar"><span>⚔️ 陣營勝率</span></div>
-  <div class="card fade-up">
-    <div class="vs-wrap" id="vs-wrap">
-      <div class="vs-track" id="vs-track">
-        <div class="vs-left"  id="vs-lb" style="width:0"></div>
-        <div class="vs-right" id="vs-rb" style="width:0"></div>
-        <canvas class="vs-pc" id="vs-pc"></canvas>
-        <canvas class="vs-lc" id="vs-lc"></canvas>
-        <div class="vs-info">
-          <div class="vs-side left" id="vs-fl">
-            <span class="vs-cname">織田軍</span>
-            <span class="vs-pct" id="vs-rl">${odaPct}%</span>
-          </div>
-          <div class="vs-side right" id="vs-fr">
-            <span class="vs-cname">聯合軍</span>
-            <span class="vs-pct" id="vs-rr">${uniPct}%</span>
-          </div>
+  <div class="vs-wrap fade-up" id="vs-wrap">
+    <div class="vs-track" id="vs-track">
+      <div class="vs-left"  id="vs-lb" style="width:0"></div>
+      <div class="vs-right" id="vs-rb" style="width:0"></div>
+      <canvas class="vs-pc" id="vs-pc"></canvas>
+      <canvas class="vs-lc" id="vs-lc"></canvas>
+      <div class="vs-info">
+        <div class="vs-side left" id="vs-fl">
+          <span class="vs-cname">織田軍</span>
+          <span class="vs-pct" id="vs-rl">${odaPct}%</span>
         </div>
-        <div class="vs-gold-line"></div>
+        <div class="vs-side right" id="vs-fr">
+          <span class="vs-cname">聯合軍</span>
+          <span class="vs-pct" id="vs-rr">${uniPct}%</span>
+        </div>
       </div>
-      <div class="vs-sub-line">共 ${totM} 場 &nbsp;·&nbsp; 織田軍 ${odaW}W &nbsp;·&nbsp; 聯合軍 ${totM-odaW}W</div>
+      <div class="vs-gold-line"></div>
     </div>
+    <div class="vs-sub-line">共 ${totM} 場 &nbsp;·&nbsp; 織田軍 ${odaW}W &nbsp;·&nbsp; 聯合軍 ${totM-odaW}W</div>
   </div>
   <div class="sec-bar"><span>🏆 玩家總覽</span></div>
   <div class="ptable-wrap fade-up">`;
@@ -495,7 +492,7 @@ function renderPlayers(){
     const rankCol=i===0?'#fbbf24':i===1?'#94a3b8':i===2?'#78350f':'#334155';
     const isOpen=openedPlayer===p.name;
     const moneyRaw=Math.round(p.money*10)/10;
-    const moneyStr=`${moneyRaw>=0?'+':''}$${moneyRaw}`;
+    const moneyStr=`${moneyRaw>=0?'+':''}\$${moneyRaw}`;
     const moneyColor=moneyRaw>=0?'#4ade80':'#f87171';
     const rowCls=p.streakWin?'last-win':'last-lose';
     const badgeHTML=p.badges.map(b=>`<span class="badge ${b.cls}">${b.txt}</span>`).join('');
@@ -538,23 +535,19 @@ function renderPlayers(){
 
   allTeams.forEach((t,ti)=>{
     const heroChips=t.topHeroes.map((h,idx)=>`<span class="hero-chip hero-chip-${idx}">${['🥇','🥈','🥉'][idx]} ${h}</span>`).join('');
+    const sizeTag=`<span style="font-size:9px;color:#334155;border:1px solid #1e293b;padding:0 4px;border-radius:3px;margin-left:2px">${t.members.length}人</span>`;
     html+=`<div class="team-card fade-up" style="animation-delay:${ti*.04}s">
-      <div style="flex-shrink:0;min-width:46px;text-align:center">
-        <div class="fs16 fw8" style="font-size:20px;color:${rateCol(t.rate)}">${t.rate}%</div>
-      </div>
-      <div style="flex:1;min-width:120px">
-        <div class="row-wrap" style="gap:4px;margin-bottom:6px">${t.members.map(m=>`<span class="tag">${m}</span>`).join('')}</div>
-        <div class="row-wrap" style="gap:4px">
-          <span class="fs9 muted" style="margin-right:2px">默契英雄</span>${heroChips}
+      <div class="team-row">
+        <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+          ${t.members.map(m=>`<span style="font-size:13px;font-weight:800;color:#e2e8f0;padding:2px 9px;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.12);border-radius:20px">${m}</span>`).join('')}${sizeTag}
         </div>
-      </div>
-      <div style="text-align:right;flex-shrink:0;min-width:52px">
-        <div class="row" style="align-items:baseline;justify-content:flex-end;gap:2px">
-          <span class="fw7 green fs15">${t.wins}</span><span class="muted fs10">W</span>
-          <span style="color:#0d1117;margin:0 1px">·</span>
-          <span class="red fw6 fs15">${t.losses}</span><span class="muted fs10">L</span>
+        <div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end;align-items:center">
+          ${heroChips}
         </div>
-        <div class="fs10 dim2" style="margin-top:1px">${t.total} 場</div>
+        <div style="text-align:center">
+          <div class="rate-num" style="color:${rateCol(t.rate)}">${t.rate}%</div>
+          <div style="font-size:10px;color:#475569;margin-top:2px;font-variant-numeric:tabular-nums">${t.wins}W·${t.losses}L</div>
+        </div>
       </div>
     </div>`;
   });
@@ -604,10 +597,12 @@ function renderMatches(){
   entries.forEach(([date,ms],di)=>{
     const dOdaW=ms.filter(m=>m.winner==='oda').length;
     const isNewest=date===newestDate,isOpen=openDates.has(date);
+    const bets=[...new Set(ms.map(m=>m.bet))];
+    const betStr=bets.length===1?`\$${bets[0]}`:`\$${Math.min(...bets)}~\$${Math.max(...bets)}`;
     const matchesHTML=ms.map(m=>`<div class="match-compact">
       <div class="match-compact-head">
         <span style="font-size:12px;font-weight:700;color:#94a3b8">${m.match}</span>
-        <span style="font-size:11px;font-weight:700;color:#fbbf24">$${m.bet}</span>
+        <span style="font-size:11px;font-weight:700;color:#fbbf24">\$${m.bet}</span>
       </div>
       <div class="match-teams">
         ${[{team:m.oda,side:'oda',label:'織田軍'},{team:m.united,side:'united',label:'聯合軍'}].map(({team,side,label})=>{
@@ -620,12 +615,11 @@ function renderMatches(){
       </div>
     </div>`).join('');
     html+=`<div class="tl-date-node fade-up" style="animation-delay:${di*.05}s">
-      <div class="tl-dot${isNewest?' new':''}"></div>
+      <div class="tl-dot${isNewest?' new':''}" ></div>
       <div class="tl-date-label" onclick="toggleDate('${date}')">
-        <span class="tl-date-text">${date}</span>${isNewest?'<span class="new-badge">NEW</span>':''}
-        <div class="tl-date-meta">
+        <span class="tl-date-text">${date}</span>${isNewest?'<span class="new-badge">NEW</span>':''}<div class="tl-date-meta">
           <span style="color:#475569">${ms.length}場</span>
-          ${isNewest?`<span style="font-weight:700;color:#fbbf24">$${ms[0]?.bet}/場</span>`:''}
+          <span style="font-weight:700;color:#fbbf24">${betStr}</span>
           <span style="font-weight:600;color:#4ade80">織田${dOdaW}W</span>
           <span style="font-weight:600;color:#f87171">聯合${ms.length-dOdaW}W</span>
         </div>
@@ -663,7 +657,7 @@ function fallbackDownload(blob){
 
 function renderTools(){
   const canRand=pickedSet.size>=6&&pickedSet.size<=7;
-  const pickItems=allPNames.map(n=>`<div class="pick-item${pickedSet.has(n)?' sel':''}" onclick="togglePick('${n}')">${pickedSet.has(n)?'✓ ':''}${n}</div>`).join('');
+  const pickItems=allPNames.map(n=>`<div class="pick-item${pickedSet.has(n)?' sel':''}" onclick="togglePick('${n}')">${pickedSet.has(n)?'✓ ':''} ${n}</div>`).join('');
   const pRateMap={},pStatsMap={};
   allPlayers.forEach(p=>{pRateMap[p.name]=p.rate;pStatsMap[p.name]={wins:p.wins,total:p.total};});
   let teamHTML='';
