@@ -44,8 +44,8 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);min-hei
 /* VS BAR */
 .vs-wrap{position:relative;transition:transform .05s ease;margin-bottom:18px}
 .vs-track{position:relative;height:120px;border-radius:12px;overflow:hidden;cursor:pointer;border:1px solid rgba(212,175,55,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 4px 20px rgba(0,0,0,.5);background:#0d0e11}
-.vs-left{position:absolute;top:0;left:0;bottom:0;background:linear-gradient(90deg,#3d0000,#7a0000 50%,#c0392b 85%,#e74c3c);transition:width .9s cubic-bezier(.4,0,.2,1)}
-.vs-right{position:absolute;top:0;right:0;bottom:0;background:linear-gradient(270deg,#00103d,#002580 50%,#1a5fa0 85%,#2980b9);transition:width .9s cubic-bezier(.4,0,.2,1)}
+.vs-left{position:absolute;top:0;left:0;bottom:0;transition:width .9s cubic-bezier(.4,0,.2,1)}
+.vs-right{position:absolute;top:0;right:0;bottom:0;transition:width .9s cubic-bezier(.4,0,.2,1)}
 .vs-left::after,.vs-right::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 5px,rgba(255,255,255,.02) 5px,rgba(255,255,255,.02) 6px)}
 .vs-gold-line{position:absolute;bottom:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,transparent,#d4af37,transparent);opacity:.5;z-index:2;pointer-events:none}
 .vs-pc,.vs-lc{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
@@ -54,13 +54,23 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);min-hei
 .vs-side{display:flex;flex-direction:column;gap:2px}
 .vs-side.right{align-items:flex-end}
 .vs-cname{font-size:11px;font-weight:800;letter-spacing:2px;color:rgba(255,255,255,.45)}
-.vs-pct{font-size:42px;font-weight:900;color:#d4af37;text-shadow:2px 2px 8px rgba(0,0,0,.8),0 0 18px rgba(212,175,55,.25);line-height:1;font-style:italic;font-variant-numeric:tabular-nums}
+.vs-pct{font-size:42px;font-weight:900;text-shadow:2px 2px 8px rgba(0,0,0,.8);line-height:1;font-style:italic;font-variant-numeric:tabular-nums}
 .vs-side.hovered .vs-pct{animation:rateShake .3s ease infinite}
 .vs-sub-line{margin-top:7px;text-align:center;font-size:10px;color:rgba(255,255,255,.25);letter-spacing:.5px}
+.vs-stat-bar{display:flex;justify-content:center;align-items:center;gap:14px;padding:6px 16px 10px;font-size:14px;font-weight:800;letter-spacing:.4px}
+.vs-stat-total{color:#94a3b8}
+.vs-stat-sep{color:#334155;font-size:12px}
 
 /* PLAYER TABLE */
 .ptable-wrap{background:var(--card);border:1px solid var(--bdr);border-radius:13px;backdrop-filter:blur(14px);overflow:hidden;margin-bottom:8px}
-.prow-wrap{border-bottom:1px solid rgba(148,163,184,.04);cursor:pointer;transition:background .15s;border-left:4px solid transparent;display:grid;grid-template-columns:24px 1fr 90px 36px 68px;gap:6px;align-items:center;padding:11px 12px}
+.prow-wrap{border-bottom:1px solid rgba(148,163,184,.04);cursor:pointer;transition:background .15s;border-left:4px solid transparent;display:grid;grid-template-columns:36px minmax(120px,2fr) minmax(70px,1fr) minmax(56px,1fr) minmax(72px,1fr) minmax(72px,1fr);gap:10px;align-items:center;padding:12px 16px}
+.kanji-row{display:flex;gap:3px;align-items:center;justify-content:center;flex-wrap:wrap}
+.kw{font-size:13px;font-weight:900;color:#4ade80;text-shadow:0 0 8px rgba(74,222,128,.5);line-height:1}
+.kl{font-size:13px;font-weight:900;color:#f87171;text-shadow:0 0 8px rgba(248,113,113,.4);line-height:1}
+.wl-row{display:flex;align-items:center;justify-content:center;gap:4px}
+.wl-w{font-size:14px;font-weight:800;color:#4ade80}
+.wl-sep{font-size:10px;color:#334155}
+.wl-l{font-size:14px;font-weight:800;color:#f87171}
 .prow-wrap:hover{background:rgba(148,163,184,.03)}
 .prow-wrap.open{background:rgba(148,163,184,.04);border-left-color:#475569}
 .prow-wrap.last-win{border-left-color:rgba(74,222,128,.4)}
@@ -79,7 +89,9 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);min-hei
 
 /* TEAM CARDS — Grid Layout */
 .team-card{background:var(--card);border:1px solid var(--bdr);border-radius:11px;padding:0;overflow:hidden;margin-bottom:7px}
-.team-row{display:grid;grid-template-columns:1fr auto 90px;gap:8px;align-items:center;padding:11px 14px;transition:background .15s}
+.team-row{display:grid;grid-template-columns:minmax(120px,2fr) minmax(90px,1fr) minmax(56px,1fr) minmax(72px,1fr);gap:10px;align-items:center;padding:12px 16px;border-left:4px solid transparent;transition:background .15s}
+.team-row.last-win{border-left-color:rgba(74,222,128,.55)}
+.team-row.last-lose{border-left-color:rgba(248,113,113,.5)}
 .team-row:hover{background:rgba(148,163,184,.03)}
 .tag{font-size:11px;font-weight:700;padding:2px 9px;background:rgba(148,163,184,.05);border:1px solid rgba(148,163,184,.1);border-radius:20px;color:#94a3b8}
 .hero-chip{font-size:10px;padding:1px 5px;border-radius:5px;font-weight:600}
@@ -136,7 +148,7 @@ footer{text-align:center;padding-top:36px;color:#0c1118;font-size:10px;letter-sp
   .match-teams,.team-result-teams{grid-template-columns:1fr}
   .match-team-col:first-child{border-right:none;border-bottom:1px solid rgba(148,163,184,.04)}
   .tab-btn{padding:7px 12px;font-size:12px}
-  .prow-wrap{grid-template-columns:24px 1fr 80px 60px!important}
+  .prow-wrap{grid-template-columns:36px 1fr 56px 56px!important}
   .prow-wrap>div:nth-child(4){display:none}
   .team-row{grid-template-columns:1fr 90px!important}
   .team-row>div:nth-child(2){display:none}
@@ -463,20 +475,34 @@ function renderPlayers(){
   const totM=allMatches.length;
   const odaPct=totM?Math.round(odaW/totM*100):50,uniPct=100-odaPct;
 
+  const odaIsWin=odaPct>=uniPct;
+  const odaBarGrad=odaIsWin?'linear-gradient(90deg,#052010,#0a4020 50%,#166534 85%,#16a34a)':'linear-gradient(90deg,#1a0505,#3d0a0a 50%,#7a1a1a 85%,#b91c1c)';
+  const uniBarGrad=odaIsWin?'linear-gradient(270deg,#1a0505,#3d0a0a 50%,#7a1a1a 85%,#b91c1c)':'linear-gradient(270deg,#052010,#0a4020 50%,#166534 85%,#16a34a)';
+  const odaPctCol=odaIsWin?'#4ade80':'#f87171';
+  const uniPctCol=odaIsWin?'#f87171':'#4ade80';
+  const odaLabelCol=odaIsWin?'#4ade80':'#f87171';
+  const uniLabelCol=odaIsWin?'#f87171':'#4ade80';
+  const vsBorderCol=odaIsWin?'rgba(74,222,128,.2)':'rgba(248,113,113,.2)';
   let html='<div class="sec-bar"><span>⚔️ 陣營勝率</span></div>'
     +'<div class="vs-wrap fade-up" id="vs-wrap">'
-    +'<div class="vs-track" id="vs-track">'
-    +'<div class="vs-left" id="vs-lb" style="width:0"></div>'
-    +'<div class="vs-right" id="vs-rb" style="width:0"></div>'
+    +'<div class="vs-stat-bar">'
+    +'<span class="vs-stat-total">共 '+totM+' 場</span>'
+    +'<span class="vs-stat-sep">·</span>'
+    +'<span style="color:'+odaLabelCol+';font-weight:800">織田軍 '+odaW+'W</span>'
+    +'<span class="vs-stat-sep">·</span>'
+    +'<span style="color:'+uniLabelCol+';font-weight:800">聯合軍 '+(totM-odaW)+'W</span>'
+    +'</div>'
+    +'<div class="vs-track" id="vs-track" style="border-color:'+vsBorderCol+'">'
+    +'<div class="vs-left" id="vs-lb" style="width:0;background:'+odaBarGrad+'"></div>'
+    +'<div class="vs-right" id="vs-rb" style="width:0;background:'+uniBarGrad+'"></div>'
     +'<canvas class="vs-pc" id="vs-pc"></canvas>'
     +'<canvas class="vs-lc" id="vs-lc"></canvas>'
     +'<div class="vs-info">'
-    +'<div class="vs-side left" id="vs-fl"><span class="vs-cname">織田軍</span><span class="vs-pct" id="vs-rl">'+odaPct+'%</span></div>'
-    +'<div class="vs-side right" id="vs-fr"><span class="vs-cname">聯合軍</span><span class="vs-pct" id="vs-rr">'+uniPct+'%</span></div>'
+    +'<div class="vs-side left" id="vs-fl"><span class="vs-cname">織田軍</span><span class="vs-pct" id="vs-rl" style="color:'+odaPctCol+'">'+odaPct+'%</span></div>'
+    +'<div class="vs-side right" id="vs-fr"><span class="vs-cname">聯合軍</span><span class="vs-pct" id="vs-rr" style="color:'+uniPctCol+'">'+uniPct+'%</span></div>'
     +'</div>'
     +'<div class="vs-gold-line"></div>'
     +'</div>'
-    +'<div class="vs-sub-line">共 '+totM+' 場 &nbsp;·&nbsp; 織田軍 '+odaW+'W &nbsp;·&nbsp; 聯合軍 '+(totM-odaW)+'W</div>'
     +'</div>'
     +'<div class="sec-bar"><span>🏆 玩家總覽</span></div>'
     +'<div class="ptable-wrap fade-up">';
@@ -493,13 +519,13 @@ function renderPlayers(){
     const badgeHTML=p.badges.map(b=>'<span class="badge '+b.cls+'">'+b.txt+'</span>').join('');
     html+='<div>'
       +'<div class="prow-wrap '+rowCls+(isOpen?' open':'')+'" onclick="togglePlayer(\''+p.name+'\')">'
-      +'<div class="fs14 fw7 ta-c" style="font-size:'+(i<3?15:12)+'px;color:'+rankCol+'">'+rankIcon+'</div>'
-      +'<div>'
-      +'<div class="row-wrap" style="line-height:1.3"><span class="fs14 fw7" style="color:#e2e8f0">'+p.name+'</span><span style="margin-left:5px">'+badgeHTML+'</span></div>'
-      +'<div class="row fs12" style="gap:5px;align-items:baseline;margin-top:3px"><span class="fw7 green">'+p.wins+'W</span><span class="muted">/</span><span class="fw7 red">'+p.losses+'L</span><span class="muted fs11">'+p.total+'場</span></div>'
+      +'<div class="fw8 ta-c" style="font-size:'+(i<3?15:12)+'px;color:'+rankCol+'">'+rankIcon+'</div>'
+      +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">'
+      +'<span class="fs14 fw8" style="color:#e2e8f0">'+p.name+'</span>'+badgeHTML
       +'</div>'
-      +'<div class="col ta-c" style="gap:4px"><div class="rate-num" style="color:'+col+'">'+p.rate+'%</div>'+sparklineHTML(p.spark)+'</div>'
-      +'<div class="ta-c"><div class="fs16 fw8" style="color:#64748b">'+p.heroStats.length+'</div></div>'
+      +'<div class="kanji-row">'+p.spark.map(v=>v===null?'':v===1?'<span class="kw">勝</span>':'<span class="kl">負</span>').join('')+'</div>'
+      +'<div class="rate-num ta-c" style="color:'+col+'">'+p.rate+'%</div>'
+      +'<div class="wl-row"><span class="wl-w">'+p.wins+'W</span><span class="wl-sep">·</span><span class="wl-l">'+p.losses+'L</span></div>'
       +'<div class="ta-r"><div class="fs14 fw7" style="color:'+moneyColor+'">'+moneyStr+'</div></div>'
       +'</div>'
       +'<div class="hero-expand-row" id="expand-'+p.name+'" style="max-height:'+(isOpen?'2000px':'0')+';transition:max-height .3s ease">'
@@ -515,14 +541,13 @@ function renderPlayers(){
     const heroChips=t.topHeroes.map((h,idx)=>'<span class="hero-chip hero-chip-'+idx+'">'+['🥇','🥈','🥉'][idx]+' '+h+'</span>').join('');
     const sizeTag='<span style="font-size:9px;color:#334155;border:1px solid #1e293b;padding:0 4px;border-radius:3px;margin-left:3px">'+t.members.length+'人</span>';
     html+='<div class="team-card fade-up" style="animation-delay:'+(ti*0.04)+'s">'
-      +'<div class="team-row">'
+      +'<div class="team-row '+(t.rate>=50?'last-win':'last-lose')+'">'
       +'<div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">'
-      +t.members.map(m=>'<span style="font-size:13px;font-weight:800;color:#e2e8f0;padding:2px 9px;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.12);border-radius:20px">'+m+'</span>').join('')+sizeTag
+      +t.members.map(m=>'<span style="font-size:13px;font-weight:800;color:#e2e8f0;padding:2px 9px;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.12);border-radius:20px">'+m+'</span>').join('')
       +'</div>'
-      +'<div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end;align-items:center;padding:0 6px">'+heroChips+'</div>'
-      +'<div style="text-align:center;min-width:80px">'
-      +'<div class="rate-num" style="color:'+rateCol(t.rate)+'">'+t.rate+'%</div>'
-      +'<div style="font-size:10px;color:#475569;margin-top:2px;font-variant-numeric:tabular-nums">'+t.wins+'W·'+t.losses+'L</div>'
+      +'<div style="display:flex;gap:3px;flex-wrap:wrap;align-items:center">'+heroChips+'</div>'
+      +'<div class="ta-c"><div class="rate-num" style="color:'+rateCol(t.rate)+'">'+t.rate+'%</div></div>'
+      +'<div class="wl-row"><span class="wl-w">'+t.wins+'W</span><span class="wl-sep">·</span><span class="wl-l">'+t.losses+'L</span></div>'
       +'</div>'
       +'</div>'
       +'</div>';
